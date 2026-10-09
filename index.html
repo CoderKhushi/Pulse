@@ -1,0 +1,1396 @@
+<title>Pulse Family App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#ffffff">
+<style>
+/* Layout concept: a phone-sized home. White ground, green ink, one bold moment (the kolam ring around the family photo), everything else quiet and rounded. */
+:root{
+  --g500:#5B964A; --g700:#3B602D; --g600:#4B7A3C; --g400:#7DB06C; --g200:#C9E0BF; --g100:#E3EFDD; --g50:#F3F8F0;
+  --ink:#1D2A18; --ink2:#52604C; --ink3:#8A9785; --line:#E4ECDF; --bg:#FFFFFF;
+  --gold:#F0AE1B; --gold2:#C98A00; --gold-soft:#FFF3D1; --coral:#E0614A; --coral-soft:#FCE8E3; --sky:#4C8FB5; --sky-soft:#E6F1F7;
+  --yellow:#EDB92C; --yellow-soft:#FFF4CF;
+  --display:'Baloo 2','Trebuchet MS',system-ui,sans-serif; --body:'Nunito','Segoe UI',system-ui,sans-serif;
+  --r-lg:26px; --r-md:18px; --r-sm:12px;
+  --shadow:0 6px 24px rgba(59,96,45,.10); --shadow-sm:0 2px 8px rgba(59,96,45,.08);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.4;overflow-x:hidden}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+h1,h2,h3,h4,p{margin:0}
+svg{display:block}
+.ico{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ico.fill{fill:currentColor;stroke:none}
+
+/* stage */
+.stage{min-height:100%;display:flex;justify-content:center;align-items:center;gap:56px;padding:20px}
+.side{width:340px;flex:none;display:none}
+.phoneWrap{width:100%;display:flex;justify-content:center}
+.phone{position:relative;width:100%;max-width:430px;height:100%;min-height:100%;background:#fff;overflow:hidden;display:flex;flex-direction:column}
+@media(min-width:760px){
+  .stage{padding:24px 20px}
+  .phone{width:392px;height:min(820px,calc(100vh - 48px));min-height:640px;min-height:0;border-radius:44px;border:10px solid #1d2a18;box-shadow:0 30px 70px rgba(29,42,24,.28)}
+}
+@media(min-width:1040px){.side{display:block}.stage{align-items:flex-start}.phoneWrap{position:sticky;top:24px;align-self:flex-start;width:auto}}
+@media(max-width:759px){.stage{padding:0;display:block;height:100%}.phoneWrap{height:100%}}
+
+.side h1{font-family:var(--display);font-size:44px;line-height:1;color:var(--g700);font-weight:800;letter-spacing:-.5px}
+.side .tag{color:var(--ink2);margin:8px 0 22px;font-size:17px}
+.side h3{font-family:var(--display);font-size:15px;color:var(--g700);margin:20px 0 8px;font-weight:700}
+.demo-step{display:flex;gap:10px;align-items:center;width:100%;text-align:left;padding:9px 12px;border-radius:14px;border:1.5px solid var(--line);margin-bottom:7px;font-weight:700;font-size:14px;background:#fff;transition:.15s}
+.demo-step:hover{border-color:var(--g500);background:var(--g50)}
+.demo-step b{width:24px;height:24px;border-radius:50%;background:var(--g100);color:var(--g700);display:grid;place-items:center;font-size:12px;flex:none}
+.demo-row{display:flex;flex-wrap:wrap;gap:6px}
+.demo-chip{padding:7px 12px;border-radius:99px;border:1.5px solid var(--line);font-weight:800;font-size:13px}
+.demo-chip.on{background:var(--g700);color:#fff;border-color:var(--g700)}
+.side .note{font-size:13px;color:var(--ink2);line-height:1.5}
+.side .note li{margin-bottom:4px}
+.side ul{padding-left:18px;margin:0}
+
+/* views */
+.view{display:flex;flex-direction:column;flex:1;min-height:0;position:relative}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 18px 28px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.scroll.has-tab{padding-bottom:100px}
+.topbar{display:flex;align-items:center;gap:10px;padding:16px 18px 10px;flex:none}
+.topbar .grow{flex:1;min-width:0}
+.hello{font-family:var(--display);font-weight:700;font-size:20px;line-height:1.1;color:var(--ink)}
+.sub{font-size:13.5px;color:var(--ink2);font-weight:600}
+.iconbtn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--g50);color:var(--g700);position:relative;flex:none}
+.iconbtn .dot{position:absolute;top:8px;right:9px;width:10px;height:10px;border-radius:50%;background:var(--coral);border:2px solid #fff}
+.hearts{display:flex;align-items:center;gap:5px;background:var(--gold-soft);color:var(--gold2);border-radius:99px;padding:7px 12px 7px 9px;font-weight:900;font-size:15px;flex:none}
+.hearts .ico{width:18px;height:18px;color:var(--coral)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;font-weight:800;font-size:12.5px;background:var(--g100);color:var(--g700)}
+.pill.gold{background:var(--gold-soft);color:var(--gold2)}
+.pill.coral{background:var(--coral-soft);color:var(--coral)}
+.pill.sky{background:var(--sky-soft);color:var(--sky)}
+.pill.line{background:#fff;border:1.5px solid var(--line);color:var(--ink2)}
+.pill .ico{width:14px;height:14px}
+
+/* tab bar */
+.tabbar{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1.5px solid var(--line);display:flex;justify-content:space-around;padding:8px 8px calc(10px + env(safe-area-inset-bottom,0px));z-index:5}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:62px;padding:6px 8px;border-radius:16px;color:var(--ink3);font-weight:800;font-size:11.5px;position:relative}
+.tab .ico{width:25px;height:25px}
+.tab.on{color:var(--g700)}
+.tab.on .ico{stroke-width:2.4}
+.tab.on::before{content:"";position:absolute;top:-9px;width:26px;height:4px;border-radius:0 0 4px 4px;background:var(--g500)}
+.tab.center .bub{width:50px;height:50px;border-radius:50%;background:linear-gradient(145deg,var(--g500),var(--g700));color:#fff;display:grid;place-items:center;margin-top:-26px;box-shadow:0 6px 16px rgba(59,96,45,.35);border:4px solid #fff}
+.tab.center.on::before{display:none}
+.tab.center{color:var(--g700)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 22px;border-radius:99px;font-weight:900;font-size:16px;background:var(--g500);color:#fff;box-shadow:0 4px 0 var(--g700);transition:transform .08s,box-shadow .08s;text-align:center}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--g700)}
+.btn.block{width:100%}
+.btn.soft{background:var(--g100);color:var(--g700);box-shadow:0 4px 0 var(--g200)}
+.btn.ghost{background:#fff;color:var(--g700);border:2px solid var(--g200);box-shadow:none;min-height:46px}
+.btn.gold{background:var(--gold);color:#4a3200;box-shadow:0 4px 0 var(--gold2)}
+.btn.coral{background:var(--coral);box-shadow:0 4px 0 #b34532}
+.btn.sm{min-height:40px;padding:0 16px;font-size:14px;box-shadow:0 3px 0 var(--g700)}
+.btn.sm.soft{box-shadow:0 3px 0 var(--g200)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.link{color:var(--g700);font-weight:800;text-decoration:underline;text-underline-offset:3px;font-size:14px}
+
+/* cards */
+.card{background:#fff;border:1.5px solid var(--line);border-radius:var(--r-lg);padding:16px;position:relative}
+.card.tint{background:var(--g50);border-color:var(--g100)}
+.card.gold{background:var(--gold-soft);border-color:#F6DE9B}
+.card.shadow{box-shadow:var(--shadow);border-color:transparent}
+.card.dark{background:linear-gradient(150deg,var(--g600),var(--g700));color:#fff;border:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack.s8{gap:8px}.stack.s10{gap:10px}.stack.s20{gap:20px}
+.row{display:flex;align-items:center;gap:12px}
+.row.top{align-items:flex-start}
+.row.between{justify-content:space-between}
+.row.wrap{flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.h2{font-family:var(--display);font-weight:700;font-size:20px;line-height:1.15;color:var(--ink)}
+.h3{font-family:var(--display);font-weight:700;font-size:17px;line-height:1.2}
+.h1{font-family:var(--display);font-weight:800;font-size:30px;line-height:1.05;color:var(--g700)}
+.muted{color:var(--ink2);font-size:14px}
+.tiny{font-size:12.5px;color:var(--ink3);font-weight:700}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:6px 2px -4px}
+.sec .h2{font-size:18px}
+.center{text-align:center}
+.divider{height:1.5px;background:var(--line);margin:4px 0}
+
+/* progress */
+.bar{height:12px;border-radius:99px;background:var(--g100);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--g400),var(--g500));transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.bar.gold{background:#FBE7B0}.bar.gold>i{background:linear-gradient(90deg,#F7C84A,var(--gold))}
+.bar.thin{height:8px}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 15px;border-radius:99px;border:2px solid var(--line);font-weight:800;font-size:14.5px;background:#fff;color:var(--ink2);transition:.12s;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:var(--g100);border-color:var(--g500);color:var(--g700)}
+.chip:active{transform:scale(.96)}
+
+/* kolam hero */
+.kolam{position:relative;width:min(100%,330px);aspect-ratio:1;margin:0 auto}
+.kolam svg{width:100%;height:100%;overflow:visible}
+.petal{cursor:pointer;transition:transform .3s}
+.petal .shape{fill:#fff;stroke:var(--g200);stroke-width:2.5;stroke-dasharray:5 5;transition:.5s}
+.petal.done .shape{fill:url(#pg);stroke:var(--g500);stroke-dasharray:none}
+.petal.next .shape{stroke:var(--gold);stroke-width:3.5;animation:pulseStroke 1.6s infinite}
+.petal:hover{transform:scale(1.04)}
+.petal .pico{color:var(--g400)}
+.petal.done .pico{color:#fff}
+.petal.next .pico{color:var(--gold2)}
+@keyframes pulseStroke{50%{stroke-width:6;stroke:#F7CE6A}}
+.photo-tap{cursor:pointer}
+.kolam .centerHint{position:absolute;left:0;right:0;bottom:2%;text-align:center}
+.bloom{animation:bloom .7s cubic-bezier(.3,1.6,.5,1)}
+@keyframes bloom{from{transform:scale(.6);opacity:.2}to{transform:scale(1);opacity:1}}
+.glow{filter:drop-shadow(0 0 10px rgba(240,174,27,.65))}
+
+/* quest rows */
+.quest{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--r-md);border:1.5px solid var(--line);background:#fff;width:100%;text-align:left}
+.quest .qi{width:42px;height:42px;border-radius:14px;background:var(--g50);color:var(--g600);display:grid;place-items:center;flex:none}
+.quest.done{background:var(--g50);border-color:var(--g100)}
+.quest.done .qi{background:var(--g500);color:#fff}
+.quest.next{border-color:var(--gold);background:#FFFBEE}
+.quest.next .qi{background:var(--gold);color:#4a3200}
+.quest b{display:block;font-size:15.5px}
+.quest small{color:var(--ink2);font-weight:600;font-size:13px}
+.reward{margin-left:auto;font-weight:900;font-size:13px;color:var(--gold2);display:flex;align-items:center;gap:3px;flex:none}
+.reward .ico{width:15px;height:15px;color:var(--coral)}
+
+/* week strip */
+.week{display:flex;justify-content:space-between}
+.week .d{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;font-weight:800;color:var(--ink3)}
+.week svg{width:36px;height:36px}
+
+/* overlays and sheets */
+.overlay{position:absolute;inset:0;background:#fff;z-index:20;display:flex;flex-direction:column}
+.overlay.in{animation:slideIn .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes slideIn{from{transform:translateX(30%);opacity:0}to{transform:none;opacity:1}}
+.shade{position:absolute;inset:0;background:rgba(29,42,24,.45);z-index:30;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:88%;background:#fff;border-radius:30px 30px 0 0;z-index:31;display:flex;flex-direction:column;animation:up .32s cubic-bezier(.2,.9,.2,1)}
+@keyframes up{from{transform:translateY(100%)}}
+.sheet .grab{width:44px;height:5px;border-radius:9px;background:var(--line);margin:10px auto 2px;flex:none}
+.sheet .sbody{overflow-y:auto;padding:10px 20px calc(24px + env(safe-area-inset-bottom,0px));scrollbar-width:none}
+.ovhead{display:flex;align-items:center;gap:10px;padding:14px 16px 8px;flex:none}
+.ovhead .t{font-family:var(--display);font-weight:700;font-size:21px;flex:1;min-width:0;line-height:1.1}
+.ovfoot{padding:12px 18px calc(14px + env(safe-area-inset-bottom,0px));border-top:1.5px solid var(--line);flex:none;background:#fff}
+
+/* toast, push, fx */
+.toast{position:absolute;left:50%;bottom:104px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:99px;font-weight:800;font-size:14px;z-index:60;display:flex;align-items:center;gap:8px;animation:toast 2.6s forwards;max-width:90%;text-align:center;box-shadow:var(--shadow)}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,16px)}10%,85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
+.push{position:absolute;top:10px;left:10px;right:10px;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-radius:22px;padding:12px 14px;z-index:70;box-shadow:0 12px 36px rgba(29,42,24,.28);border:1.5px solid var(--line);animation:drop .5s cubic-bezier(.2,1.2,.3,1);cursor:pointer}
+@keyframes drop{from{transform:translateY(-140%)}}
+.push .pt{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--ink3);margin-bottom:5px}
+.push .pt i{width:20px;height:20px;border-radius:6px;background:var(--g500);display:grid;place-items:center;color:#fff}
+.push .pt i .ico{width:13px;height:13px}
+.push b{display:block;font-size:15px}
+.push p{font-size:14px;color:var(--ink2)}
+.push .pa{display:flex;gap:8px;margin-top:8px}
+.push .pa button{flex:1;padding:8px;border-radius:12px;background:var(--g100);color:var(--g700);font-weight:900;font-size:14px}
+#fx{position:absolute;inset:0;pointer-events:none;z-index:80;overflow:hidden}
+.conf{position:absolute;top:-20px;width:10px;height:14px;border-radius:3px;animation:fall 2.4s ease-in forwards}
+@keyframes fall{to{transform:translateY(900px) rotate(720deg);opacity:.9}}
+.floatheart{position:absolute;bottom:20%;font-size:28px;animation:floaty 1.8s ease-out forwards}
+@keyframes floaty{to{transform:translateY(-300px) scale(1.4);opacity:0}}
+
+/* voice player */
+.voicebox{position:absolute;inset:0;z-index:50;background:rgba(29,42,24,.55);display:grid;place-items:center;padding:24px;animation:fade .2s}
+.voicecard{background:#fff;border-radius:32px;padding:26px 22px 22px;width:100%;text-align:center;animation:pop .45s cubic-bezier(.3,1.5,.5,1)}
+@keyframes pop{from{transform:scale(.7);opacity:0}}
+.wave{display:flex;align-items:center;justify-content:center;gap:4px;height:44px;margin:12px 0}
+.wave i{width:5px;border-radius:5px;background:var(--g500);height:10px;animation:wv 0.9s ease-in-out infinite}
+.wave i:nth-child(3n){animation-delay:.15s;background:var(--g400)}.wave i:nth-child(3n+1){animation-delay:.3s}
+@keyframes wv{50%{height:40px}}
+.wave.off i{animation:none;height:6px;background:var(--g200)}
+.wave.rec i{background:var(--coral)}
+
+/* inputs */
+.field{width:100%;border:2px solid var(--line);border-radius:16px;padding:13px 16px;font:inherit;font-size:17px;font-weight:700;color:var(--ink);background:#fff}
+.field:focus{border-color:var(--g500);outline:none}
+.lbl{font-weight:800;font-size:13.5px;color:var(--ink2);margin-bottom:6px;display:block}
+.toggle{width:52px;height:30px;border-radius:99px;background:var(--line);position:relative;flex:none;transition:.2s}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.2s}
+.toggle.on{background:var(--g500)}.toggle.on::after{left:25px}
+.toggle.locked{background:var(--g200);opacity:.8}
+.item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1.5px solid var(--line)}
+.item:last-child{border:0}
+.av{display:block;border-radius:50%;overflow:hidden;flex:none;background:var(--g100)}
+.calm .ico,.warn .ico{display:inline-block;vertical-align:-5px;margin-right:6px}
+
+/* dish */
+.dish{border:2px solid var(--line);border-radius:20px;padding:12px 8px 10px;text-align:center;background:#fff;position:relative;overflow:hidden;width:100%}
+.dish .em{font-size:34px;line-height:1.1}
+.dish b{display:block;font-size:14px;margin-top:2px}
+.dish small{font-weight:800;font-size:12px;color:var(--ink2)}
+.dish.g{border-color:var(--g200);background:var(--g50)}
+.dish.y{border-color:#F4DB8A;background:#FFFAE6}
+.dish.r{border-color:#F3B9AD;background:#FFF3F0}
+.dish.u{border-style:dashed;background:#fff}
+.dish.u .em{filter:grayscale(1) opacity(.4)}
+.dish .cdot{position:absolute;top:8px;right:8px;width:12px;height:12px;border-radius:50%}
+.dish.g .cdot{background:var(--g500)}.dish.y .cdot{background:var(--yellow)}.dish.r .cdot{background:var(--coral)}
+.dish.sel{border-color:var(--g500);background:var(--g100)}
+.dish .cnt{position:absolute;top:6px;left:6px;background:var(--g700);color:#fff;border-radius:99px;min-width:24px;height:24px;display:grid;place-items:center;font-size:13px;font-weight:900;padding:0 6px}
+.cbadge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 8px;border-radius:99px;font-weight:900;font-size:12.5px}
+.cbadge::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}
+.cbadge.g{background:var(--g100);color:var(--g700)}.cbadge.y{background:var(--yellow-soft);color:#9a7000}.cbadge.r{background:var(--coral-soft);color:var(--coral)}.cbadge.u{background:#eee;color:#777}
+.flip{animation:flip .8s cubic-bezier(.3,1.3,.5,1)}
+@keyframes flip{from{transform:rotateY(90deg) scale(.8)}}
+
+/* mic */
+.micwrap{position:relative;width:170px;height:170px;margin:0 auto;display:grid;place-items:center;touch-action:none;user-select:none}
+.mic{width:120px;height:120px;border-radius:50%;background:linear-gradient(150deg,var(--g500),var(--g700));color:#fff;display:grid;place-items:center;box-shadow:0 8px 0 #2b4621,0 14px 30px rgba(59,96,45,.35);position:relative;z-index:2;transition:transform .1s}
+.mic .ico{width:50px;height:50px}
+.micwrap.live .mic{transform:scale(1.08);background:linear-gradient(150deg,var(--coral),#b34532);box-shadow:0 8px 0 #8d2f1f}
+.micwrap .ring{position:absolute;inset:10px;border-radius:50%;border:3px solid var(--g400);opacity:0}
+.micwrap.live .ring{animation:ripple 1.3s infinite}
+.micwrap.live .ring:nth-child(2){animation-delay:.45s}
+@keyframes ripple{from{transform:scale(.8);opacity:.9}to{transform:scale(1.5);opacity:0}}
+
+/* misc */
+.stat{background:var(--g50);border-radius:18px;padding:12px;text-align:center}
+.stat b{font-family:var(--display);font-size:24px;display:block;line-height:1.1;color:var(--g700)}
+.stat small{font-size:12px;font-weight:800;color:var(--ink2)}
+.seg{display:flex;background:var(--g50);border-radius:99px;padding:4px;gap:2px}
+.seg button{flex:1;padding:9px 6px;border-radius:99px;font-weight:900;font-size:14px;color:var(--ink2)}
+.seg button.on{background:#fff;color:var(--g700);box-shadow:var(--shadow-sm)}
+.node{display:flex;gap:14px;align-items:stretch}
+.node .rail{display:flex;flex-direction:column;align-items:center;width:46px;flex:none}
+.node .rail .bubble{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#fff;border:3px solid var(--g200);color:var(--ink3);flex:none}
+.node .rail .line{flex:1;width:4px;background:repeating-linear-gradient(var(--g200) 0 6px,transparent 6px 12px);margin:2px 0}
+.node.done .bubble{background:var(--g500);border-color:var(--g500);color:#fff}
+.node.done .line{background:var(--g500)}
+.node.now .bubble{border-color:var(--gold);background:var(--gold-soft);color:var(--gold2);animation:pulseRing 1.8s infinite}
+@keyframes pulseRing{50%{box-shadow:0 0 0 9px rgba(240,174,27,.2)}}
+.node .nb{flex:1;padding-bottom:16px;min-width:0}
+.node .nb button{width:100%;text-align:left}
+.node.locked .nb .card{opacity:.7}
+.scratch{position:relative;border-radius:22px;overflow:hidden;width:100%;aspect-ratio:1.5;background:var(--gold-soft);border:2px solid #F6DE9B;touch-action:none}
+.scratch canvas{position:absolute;inset:0;width:100%;height:100%;cursor:grab}
+.scratch .under{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:14px}
+.bubbleMsg{padding:12px 14px;border-radius:18px;background:var(--g50);max-width:88%}
+.bubbleMsg.me{background:var(--g500);color:#fff;margin-left:auto}
+.stamp{width:100%;aspect-ratio:1;border-radius:50%;border:2.5px dashed var(--g200);display:grid;place-items:center;color:var(--g200);font-weight:900}
+.stamp.on{border:0;background:var(--g500);color:#fff;transform:rotate(-8deg)}
+.welcome-door{border:2px solid var(--line);border-radius:24px;padding:16px;display:flex;gap:14px;align-items:center;text-align:left;width:100%;background:#fff;transition:.15s}
+.welcome-door:hover{border-color:var(--g500);background:var(--g50)}
+.house{width:100%;max-width:150px;margin:0 auto}
+.warn{background:var(--yellow-soft);border:1.5px solid #F4DB8A;border-radius:18px;padding:12px 14px;font-weight:700;font-size:14px}
+.calm{background:var(--sky-soft);border:1.5px solid #C5DCEA;border-radius:18px;padding:12px 14px;font-weight:700;font-size:14px;color:#2d5d7a}
+.big3{display:flex;flex-direction:column;gap:14px}
+.big3 .bigbtn{display:flex;align-items:center;gap:16px;padding:20px 20px;border-radius:28px;background:var(--g50);border:2.5px solid var(--g200);font-family:var(--display);font-weight:700;font-size:28px;text-align:left;width:100%}
+.big3 .bigbtn .bi{width:64px;height:64px;border-radius:20px;background:var(--g500);color:#fff;display:grid;place-items:center;flex:none}
+.big3 .bigbtn .bi .ico{width:34px;height:34px}
+.big3 .bigbtn small{display:block;font-family:var(--body);font-size:15px;font-weight:700;color:var(--ink2)}
+.big3 .bigbtn.done{background:var(--g100);border-color:var(--g500)}
+.easy .hello{font-size:25px}
+.easy .btn{min-height:60px;font-size:20px}
+.num{font-variant-numeric:tabular-nums}
+.big-num{font-family:var(--display);font-weight:800;font-size:72px;line-height:1;color:var(--g700);font-variant-numeric:tabular-nums}
+.stepper{display:flex;align-items:center;justify-content:center;gap:18px}
+.stepper button{width:56px;height:56px;border-radius:50%;background:var(--g100);color:var(--g700);display:grid;place-items:center;font-size:30px;font-weight:900}
+.stepper.sm button{width:38px;height:38px;font-size:22px}
+.tip{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--ink2);font-weight:600}
+.ticks{display:flex;gap:6px}
+.ticks i{height:6px;flex:1;border-radius:9px;background:var(--g100)}
+.ticks i.on{background:var(--g500)}
+input[type=range]{width:100%;accent-color:var(--g500);height:34px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.paper{background:#FFFDF6;border:1.5px solid #EFE6C8;border-radius:10px;padding:18px;box-shadow:var(--shadow-sm);transform:rotate(-1deg)}
+.hand{font-family:var(--display);font-weight:600}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+<div class="stage">
+  <aside class="side" id="side"></aside>
+  <div class="phoneWrap"><div class="phone" id="phone">
+    <div id="screen" style="flex:1;min-height:0;display:flex;flex-direction:column;position:relative"></div>
+    <div id="overlay"></div><div id="sheet"></div><div id="voice"></div><div id="push"></div><div id="toasts"></div><div id="fx"></div>
+  </div></div>
+</div>
+<script>
+/* ---------- Icons ---------- */
+const ICONS={
+home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+plate:'<path d="M6 3v7a2 2 0 0 0 4 0V3"/><path d="M8 3v18"/><path d="M17 21V3c-2 1-4 4-4 8 0 2 1 3 4 3"/>',
+path:'<path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/>',
+shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+users:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14c3 0 5 2 5 5"/>',
+mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+pill:'<rect x="3" y="8" width="18" height="8" rx="4" transform="rotate(-45 12 12)"/><path d="M9.2 9.2l5.6 5.6"/>',
+walk:'<circle cx="13" cy="4.5" r="1.8"/><path d="M12 8l-3 4 3 3 1 5M12 8l3 3 3 1M9 12l-2 4"/>',
+heart:'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
+check:'<path d="M5 12.5l4.5 4.5L19 7"/>',
+play:'<path d="M8 5l11 7-11 7z"/>',
+lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',
+user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.5 3.5-7 8-7s8 2.5 8 7"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',
+chevL:'<path d="M15 5l-7 7 7 7"/>',
+chevR:'<path d="M9 5l7 7-7 7"/>',
+x:'<path d="M6 6l12 12M18 6L6 18"/>',
+star:'<path d="M12 3l2.7 5.8 6.3.8-4.6 4.4 1.2 6.3L12 17.2 6.4 20.3l1.2-6.3L3 9.6l6.3-.8z"/>',
+gift:'<rect x="3" y="9" width="18" height="12" rx="2"/><path d="M12 9v12M3 13h18M12 9c-3 0-5-1-5-3s3-3 5 0c2-3 5-2 5 0s-2 3-5 3z"/>',
+store:'<path d="M4 9l1.5-5h13L20 9"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9"/><path d="M5 12v8h14v-8"/>',
+flask:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/>',
+eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+drop:'<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+activity:'<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+foot:'<path d="M8 21c-2 0-3-1-3-3 0-3 2-4 2-8 0-3 1-6 3.5-6S14 6 14 9c0 3 3 4 3 8 0 3-2 4-4 4z"/>',
+moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/>',
+phone:'<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 11l7.6-4M8.2 13l7.6 4"/>',
+sparkle:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
+calendar:'<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+rupee:'<path d="M7 5h10M7 9h10M7 5c5 0 7 2 7 4.5S11 14 7 14l8 6"/>',
+smile:'<circle cx="12" cy="12" r="9"/><path d="M8 14c1 1.5 2.5 2.2 4 2.2s3-.7 4-2.2M9 9.5h.01M15 9.5h.01"/>',
+scan:'<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16"/>',
+trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 14v4M8 21h8M10 18h4"/>',
+leaf:'<path d="M5 19c0-9 5-14 15-14 0 10-5 15-14 15"/><path d="M5 19c3-5 6-8 10-10"/>',
+pin:'<path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+qr:'<rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><path d="M14 14h3v3M20 14v6h-4"/>',
+rain:'<path d="M7 15a4.5 4.5 0 1 1 1-8.9A5.5 5.5 0 0 1 18.5 8 3.5 3.5 0 0 1 18 15zM8 18l-1 3M12 18l-1 3M16 18l-1 3"/>',
+msg:'<path d="M4 5h16v11H9l-5 4z"/>',
+volume:'<path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>',
+rotate:'<path d="M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5"/>',
+edit:'<path d="M4 20l1-4L16 5l3 3L8 19z"/>',
+clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+film:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 4v16"/>',
+call:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+settings:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',
+info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/>',
+file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+bolt:'<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
+};
+function ico(n,size,cls=''){const f=cls.includes('fill')?' fill':'';return `<svg class="ico${f} ${cls}" ${size?`style="width:${size}px;height:${size}px"`:''} viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]||''}</svg>`}
+function icoG(n,x,y,size){const k=size/24;return `<g transform="translate(${x-size/2},${y-size/2}) scale(${k})" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</g>`}
+
+/* ---------- People ---------- */
+const PEOPLE={
+murugan:{skin:'#B67E58',hair:'#D5D5D0',style:'grey',shirt:'#EFE9D5',mous:true,glasses:true,bg:'#DDEBD5',name:'Murugan'},
+lakshmi:{skin:'#C28A62',hair:'#2b2018',style:'bun',shirt:'#C0507A',bindi:true,bg:'#F9E4EC',name:'Lakshmi'},
+divya:{skin:'#C98F63',hair:'#1f1712',style:'long',shirt:'#4C8FB5',bindi:true,bg:'#DDEEF7',name:'Divya'},
+aadhi:{skin:'#C48D66',hair:'#1f1712',style:'kid',shirt:'#F0AE1B',bg:'#FFF1C9',name:'Aadhi'},
+priya:{skin:'#C2885F',hair:'#1f1712',style:'long',shirt:'#E8F3E2',bindi:true,bg:'#E3EFDD',name:'Priya'},
+meera:{skin:'#BF855C',hair:'#2b2018',style:'bun',shirt:'#fff',bg:'#FFF1C9',name:'Meera'},
+anitha:{skin:'#C48C64',hair:'#1f1712',style:'bun',shirt:'#fff',glasses:true,bg:'#E6F1F7',name:'Dr. Anitha'},
+karthik:{skin:'#B67E58',hair:'#1f1712',style:'short',shirt:'#fff',bg:'#E6F1F7',name:'Dr. Karthik'},
+raj:{skin:'#B67E58',hair:'#1f1712',style:'short',shirt:'#3B602D',mous:true,bg:'#E3EFDD',name:'Raj'},
+};
+function person(k,o={}){
+  const p={...PEOPLE[k],...o};const sk=p.skin,hr=p.hair;let s='';
+  if(p.style==='long')s+=`<path d="M-25 0C-27 -36 27 -36 25 0L28 44 -28 44z" fill="${hr}"/>`;
+  s+=`<path d="M-36 74C-36 42 -18 31 0 31S36 42 36 74z" fill="${p.shirt}"/>`;
+  if(p.style==='long'||p.style==='bun')s+=`<path d="M-9 32 0 44 9 32" fill="${sk}"/>`;
+  s+=`<rect x="-7" y="18" width="14" height="17" rx="6" fill="${sk}"/>`;
+  if(p.shirt==='#C0507A')s+=`<path d="M-36 74C-36 42 -18 31 0 31L14 50 8 74z" fill="#A53C63"/><path d="M-4 33 6 52" stroke="#F0AE1B" stroke-width="2.5"/>`;
+  s+=`<ellipse cx="0" cy="0" rx="22" ry="24" fill="${sk}"/>`;
+  if(p.style==='short')s+=`<path d="M-23 -3C-27 -34 27 -34 23 -3 19 -15 12 -19 0 -19S-19 -15-23 -3z" fill="${hr}"/>`;
+  if(p.style==='grey')s+=`<path d="M-23 -2C-24 -22 -12 -29 0 -28S24 -22 23 -2C20 -12 14 -16 6 -16-2 -17-12 -15-23 -2z" fill="${hr}"/>`;
+  if(p.style==='bun')s+=`<circle cx="0" cy="-31" r="10" fill="${hr}"/><path d="M-23 -3C-27 -34 27 -34 23 -3 19 -15 12 -19 0 -19S-19 -15-23 -3z" fill="${hr}"/>`;
+  if(p.style==='long')s+=`<path d="M-23 -2C-27 -35 27 -35 23 -2 18 -16 8 -20 0 -20S-18 -16-23 -2z" fill="${hr}"/>`;
+  if(p.style==='kid')s+=`<path d="M-22 -6C-26 -32 26 -32 22 -6 16 -16 -16 -16-22 -6z" fill="${hr}"/>`;
+  s+=`<circle cx="-8" cy="0" r="2.4" fill="#2a1d14"/><circle cx="8" cy="0" r="2.4" fill="#2a1d14"/>`;
+  s+=`<circle cx="-13" cy="8" r="4" fill="#E88F7A" opacity=".35"/><circle cx="13" cy="8" r="4" fill="#E88F7A" opacity=".35"/>`;
+  if(p.mous)s+=`<path d="M-10 8Q-5 3 0 6Q5 3 10 8Q5 11 0 9Q-5 11-10 8z" fill="#3a2a20"/><path d="M-6 14Q0 18 6 14" stroke="#2a1d14" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+  else s+=`<path d="M-7 10Q0 17 7 10" stroke="#2a1d14" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+  if(p.glasses)s+=`<circle cx="-8" cy="0" r="7" fill="none" stroke="#2a1d14" stroke-width="1.8"/><circle cx="8" cy="0" r="7" fill="none" stroke="#2a1d14" stroke-width="1.8"/><path d="M-1 0h2" stroke="#2a1d14" stroke-width="1.8"/>`;
+  if(p.bindi)s+=`<circle cx="0" cy="-9" r="2" fill="#D6334A"/>`;
+  return s;
+}
+function avatar(k,size=44,ring=''){
+  const p=PEOPLE[k]||PEOPLE.murugan;
+  return `<span class="av" style="width:${size}px;height:${size}px;${ring?`box-shadow:0 0 0 3px ${ring}`:''}"><svg viewBox="-38 -36 76 76" width="${size}" height="${size}"><rect x="-40" y="-40" width="80" height="80" fill="${p.bg}"/>${person(k)}</svg></span>`;
+}
+const PHOTO_BG=[['#FFF3D6','#F6D9A8','#F2C37B'],['#E6F1F7','#CFE5F0','#B7D5E6'],['#F3F8F0','#DCEBD3','#BFD9B2']];
+function familyPhoto(v=0){
+  if(S&&S.userPhoto)return `<image href="${S.userPhoto}" x="40" y="40" width="250" height="250" preserveAspectRatio="xMidYMid slice"/>`;
+  const c=PHOTO_BG[v]||PHOTO_BG[0];
+  return `<defs><linearGradient id="pbg${v}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c[0]}"/><stop offset="1" stop-color="${c[1]}"/></linearGradient></defs>
+  <rect x="0" y="0" width="330" height="330" fill="url(#pbg${v})"/>
+  <path d="M95 250V120a70 70 0 0 1 140 0V250z" fill="${c[2]}" opacity=".45"/>
+  <circle cx="165" cy="68" r="7" fill="#F0AE1B" opacity=".9"/><path d="M165 76v20" stroke="#F0AE1B" stroke-width="2"/>
+  <rect x="0" y="238" width="330" height="92" fill="#8CB77D" opacity=".55"/>
+  <g transform="translate(112,168) scale(.92)">${person('lakshmi')}</g>
+  <g transform="translate(222,168) scale(.92)">${person('divya')}</g>
+  <g transform="translate(167,158) scale(1.1)">${person('murugan')}</g>
+  <g transform="translate(205,226) scale(.62)">${person('aadhi')}</g>`;
+}
+
+/* ---------- Kolam ring ---------- */
+const QUESTS=[
+ {id:'am',ic:'pill',t:'Morning tablet',s:'After your coffee',hr:10,act:'meds'},
+ {id:'bf',ic:'plate',t:'Log breakfast',s:'Say it, snap it or tap it',hr:15,act:'log',arg:'bf'},
+ {id:'ln',ic:'plate',t:'Log lunch',s:'One tap if it is the usual',hr:15,act:'log',arg:'ln'},
+ {id:'wk',ic:'walk',t:'Walk after dinner',s:'10 minutes with Lakshmi amma',hr:20,act:'walk'},
+ {id:'pm',ic:'moon',t:'Night tablet',s:'After dinner',hr:10,act:'meds'},
+];
+function kolamSVG(quests,opts={}){
+  const cx=165,cy=165,R=128,pr=32;let s='';const next=QUESTS.find(q=>!quests[q.id]);const allDone=!next;
+  s+=`<defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7DB06C"/><stop offset="1" stop-color="#4B7A3C"/></linearGradient><clipPath id="pc"><circle cx="${cx}" cy="${cy}" r="92"/></clipPath></defs>`;
+  // pulli ring + loops
+  for(let i=0;i<20;i++){const a=i*18*Math.PI/180;s+=`<circle cx="${cx+Math.cos(a)*103}" cy="${cy+Math.sin(a)*103}" r="2.2" fill="${allDone?'#F0AE1B':'#C9E0BF'}"/>`}
+  for(let i=0;i<5;i++){
+    const a1=(-90+i*72)*Math.PI/180,a2=(-90+(i+1)*72)*Math.PI/180,am=(a1+a2)/2;
+    const p1=[cx+Math.cos(a1)*(R+pr-6),cy+Math.sin(a1)*(R+pr-6)],p2=[cx+Math.cos(a2)*(R+pr-6),cy+Math.sin(a2)*(R+pr-6)],c=[cx+Math.cos(am)*(R+34),cy+Math.sin(am)*(R+34)];
+    s+=`<path d="M${p1[0]} ${p1[1]}Q${c[0]} ${c[1]} ${p2[0]} ${p2[1]}" fill="none" stroke="${allDone?'#F0AE1B':'#C9E0BF'}" stroke-width="2.2" stroke-linecap="round"/>`;
+    s+=`<circle cx="${cx+Math.cos(am)*(R+14)}" cy="${cy+Math.sin(am)*(R+14)}" r="4.5" fill="${allDone?'#F0AE1B':'#5B964A'}"/>`;
+  }
+  QUESTS.forEach((q,i)=>{
+    const ang=-90+i*72,rad=ang*Math.PI/180,px=cx+Math.cos(rad)*R,py=cy+Math.sin(rad)*R,done=quests[q.id],isNext=next&&next.id===q.id;
+    s+=`<g class="petal ${done?'done':''} ${isNext&&!opts.ro?'next':''} ${opts.bloom===q.id?'bloom':''}" ${opts.ro?'':`data-act="petal" data-arg="${q.id}" tabindex="0" role="button"`} aria-label="${q.t}${done?', done':''}" style="transform-origin:${px}px ${py}px;${opts.ro?'cursor:default':''}">
+      <ellipse class="shape" cx="${px}" cy="${py}" rx="${pr-3}" ry="${pr+9}" transform="rotate(${ang+90} ${px} ${py})"/>
+      <g class="pico" style="color:inherit">${icoG(done?'check':q.ic,px,py,26)}</g></g>`;
+  });
+  s+=`<circle cx="${cx}" cy="${cy}" r="96" fill="#fff"/><g clip-path="url(#pc)" class="photo-tap" ${opts.ro?'':'data-act="photoTap"'}><g transform="translate(0,0)">${familyPhoto(S.photoV)}</g></g><circle cx="${cx}" cy="${cy}" r="92" fill="none" stroke="${allDone?'#F0AE1B':'#fff'}" stroke-width="${allDone?5:3}"/>`;
+  return `<svg viewBox="-12 -12 354 354" role="img" aria-label="Today's kolam: ${Object.values(quests).filter(Boolean).length} of 5 petals bloomed" class="${allDone?'glow':''}">${s}</svg>`;
+}
+function flower(n,state='part',size=36){
+  let s='';for(let i=0;i<5;i++){const a=-90+i*72,on=i<n&&state!=='rest';s+=`<ellipse cx="18" cy="9" rx="4.6" ry="7.6" transform="rotate(${a+90} 18 18) translate(0,0)" transform-origin="18 18" style="transform:rotate(${i*72}deg);transform-origin:18px 18px" fill="${on?'#5B964A':state==='future'?'#fff':'#fff'}" stroke="${on?'#3B602D':'#C9E0BF'}" stroke-width="1.5" ${on?'':'stroke-dasharray="2 2"'}/>`}
+  s+=`<circle cx="18" cy="18" r="3.2" fill="${n>=5?'#F0AE1B':state==='rest'?'#C9E0BF':'#E3EFDD'}"/>`;
+  return `<svg viewBox="0 0 36 36" width="${size}" height="${size}">${s}</svg>`;
+}
+/* ---------- Banyan ---------- */
+const LEVELS=[
+ {n:'Seed',min:0},{n:'Sprout',min:100},{n:'Sapling',min:300},{n:'Young Banyan',min:700},{n:'Grand Banyan',min:1500}];
+function levelOf(h){let l=0;LEVELS.forEach((x,i)=>{if(h>=x.min)l=i});return l}
+function banyan(l=2,size=150){
+  const g=['#7DB06C','#5B964A','#4B7A3C','#3B602D'];let s=`<ellipse cx="100" cy="176" rx="${50+l*12}" ry="8" fill="#E3EFDD"/>`;
+  if(l===0){s+=`<path d="M100 176V150" stroke="#5B964A" stroke-width="5" stroke-linecap="round"/><path d="M100 152C86 150 80 138 82 130 94 130 100 140 100 152z" fill="#7DB06C"/><path d="M100 150C114 146 120 134 118 126 106 128 100 138 100 150z" fill="#5B964A"/>`}
+  else{
+    const trunkW=[0,7,10,14,18][l];
+    s+=`<path d="M${100-trunkW} 176C${100-trunkW/2} 150 ${100-trunkW/2} 130 ${100-trunkW/2} 112L${100+trunkW/2} 112C${100+trunkW/2} 130 ${100+trunkW/2} 150 ${100+trunkW} 176z" fill="#9A7B55"/>`;
+    if(l>=4){[-46,-30,30,46].forEach(x=>{s+=`<path d="M${100+x} 108C${100+x} 140 ${100+x*1.05} 160 ${100+x*1.1} 176" stroke="#9A7B55" stroke-width="4" fill="none" stroke-linecap="round"/>`})}
+    const C=[[],[[100,100,22],[84,112,16],[116,112,16]],[[100,86,26],[78,104,20],[122,104,20],[88,118,16],[112,118,16]],[[100,76,28],[72,96,24],[128,96,24],[84,118,20],[116,118,20],[100,102,24]],[[100,66,30],[66,84,28],[134,84,28],[44,106,22],[156,106,22],[82,106,26],[118,106,26],[100,92,26]]][l];
+    C.forEach((c,i)=>{s+=`<circle cx="${c[0]}" cy="${c[1]}" r="${c[2]}" fill="${g[i%4]}"/>`});
+    if(l>=3)[[88,80],[118,92],[70,100],[132,104]].forEach(p=>{s+=`<circle cx="${p[0]}" cy="${p[1]}" r="3.4" fill="#F0AE1B"/>`});
+  }
+  return `<svg viewBox="0 0 200 190" width="${size}" height="${size*.95}" aria-hidden="true">${s}</svg>`;
+}
+/* ---------- Effects ---------- */
+let AC=null;
+function chime(kind='ok'){
+  if(!S.sound)return;
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const seq={ok:[523,659,784],win:[523,659,784,1047,1319],pop:[660],soft:[440,554]}[kind]||[660];
+    seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f;const t=AC.currentTime+i*.09;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.5);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+.55)});
+  }catch(e){}
+}
+function confetti(n=42){
+  const fx=document.getElementById('fx');if(!fx)return;const cols=['#5B964A','#F0AE1B','#E0614A','#7DB06C','#4C8FB5','#fff'];
+  for(let i=0;i<n;i++){const e=document.createElement('i');e.className='conf';e.style.left=Math.random()*100+'%';e.style.background=cols[i%cols.length];e.style.animationDelay=Math.random()*.5+'s';e.style.transform=`rotate(${Math.random()*360}deg)`;e.style.width=6+Math.random()*8+'px';fx.appendChild(e);setTimeout(()=>e.remove(),3200)}
+}
+function hearts(n=6){
+  const fx=document.getElementById('fx');if(!fx)return;
+  for(let i=0;i<n;i++){const e=document.createElement('span');e.className='floatheart';e.textContent=['💚','❤️','🧡','💛'][i%4];e.style.left=15+Math.random()*70+'%';e.style.animationDelay=i*.12+'s';fx.appendChild(e);setTimeout(()=>e.remove(),2400)}
+}
+
+/* ---------- Data ---------- */
+const DISHES=[
+{id:'idli',n:'Idli',e:'🍥',s:'g',r:28,tip:'Three idli with sambar stays green. A fourth turns it yellow.'},
+{id:'dosa',n:'Dosa',e:'🥞',s:'g',r:34,tip:'Plain dosa with chutney is fine at the usual size.'},
+{id:'pongal',n:'Pongal',e:'🍲',s:'y',r:52,tip:'Half a bowl, with sambar first, keeps it under +40.'},
+{id:'upma',n:'Upma',e:'🥣',s:null},
+{id:'chapati',n:'Chapati',e:'🫓',s:'g',r:30,tip:'Two chapati with a vegetable side is a green plate.'},
+{id:'rice',n:'Rice',e:'🍚',s:'r',r:74,tip:'One cup rises you +42. Two cups rise you +74.'},
+{id:'sambar',n:'Sambar',e:'🍛',s:'g',r:18,tip:'Extra sambar is your friend.'},
+{id:'rasam',n:'Rasam',e:'🫕',s:null},
+{id:'kootu',n:'Kootu',e:'🥘',s:'g',r:14,tip:'Your best dish. Eat it first.'},
+{id:'poriyal',n:'Poriyal',e:'🥬',s:'g',r:12,tip:'Vegetables first flattens the wave.'},
+{id:'curd',n:'Curd',e:'🥛',s:'g',r:10,tip:'Curd last works well for you.'},
+{id:'fish',n:'Fish curry',e:'🐟',s:null},
+{id:'chicken',n:'Chicken curry',e:'🍗',s:null},
+{id:'egg',n:'Egg',e:'🥚',s:null},
+{id:'lemon',n:'Lemon rice',e:'🍋',s:null},
+{id:'curdrice',n:'Curd rice',e:'🍨',s:null},
+{id:'biryani',n:'Biryani',e:'🍛',s:null},
+{id:'vada',n:'Vada',e:'🍩',s:null},
+{id:'murukku',n:'Murukku',e:'🥨',s:'r',r:66,tip:'Sundal instead gives you the crunch without the climb.'},
+{id:'sundal',n:'Sundal',e:'🥜',s:'g',r:22,tip:'A great evening swap.'},
+{id:'payasam',n:'Payasam',e:'🍮',s:null},
+{id:'banana',n:'Banana',e:'🍌',s:null},
+{id:'coffee',n:'Filter coffee',e:'☕',s:'g',r:12,tip:'Fine without extra sugar.'},
+{id:'tea',n:'Tea',e:'🍵',s:null},
+];
+const dish=id=>DISHES.find(d=>d.id===id);
+const SLOTS={bf:'Breakfast',ln:'Lunch',sn:'Evening snack',dn:'Dinner'};
+const SAMPLE={bf:[['idli',3],['sambar',1],['coffee',1]],ln:[['rice',2],['sambar',1],['poriyal',1],['curd',1]],sn:[['tea',1],['murukku',1]],dn:[['chapati',2],['kootu',1]]};
+const SAYTEXT={bf:'Three idli, sambar and filter coffee',ln:'Rice, sambar, poriyal and curd',sn:'Tea and murukku',dn:'Two chapati with kootu'};
+function colorOf(it){const d=dish(it.id);if(it.id==='rice')return it.qty<=1?'y':'r';if(it.id==='idli')return it.qty<=3?'g':'y';return d.s||'u'}
+function riseOf(it){const d=dish(it.id);if(!d.r)return 0;if(it.id==='rice')return it.qty<=1?42:74;if(it.id==='idli')return Math.round(28*it.qty/3);return d.r}
+function expect(items){const r=items.map(riseOf);if(!r.length)return 0;const m=Math.max(...r);return Math.round(m+.25*(r.reduce((a,b)=>a+b,0)-m))}
+const unit=it=>({rice:'cup',idli:'idli',chapati:'chapati',sambar:'bowl',curd:'bowl',poriyal:'bowl',kootu:'bowl',coffee:'tumbler',tea:'cup',murukku:'piece'}[it.id]||'serving');
+const VOICES=[
+ {who:'divya',text:'Proud of you, Appa!'},{who:'aadhi',text:'Thatha, super!'},{who:'lakshmi',text:'Well done. Take care, ayya.'},{who:'divya',text:'Take care. I love you, Appa.'},{who:'aadhi',text:'Thatha, you are my hero!'}];
+
+/* ---------- State ---------- */
+const S={
+ role:null,mode:'standard',tab:'home',htab:'today',ctab:'queue',stack:[],sheet:null,voice:null,
+ day:23,hearts:340,saved:1180,sound:true,nudgeStyle:'playful',quiet:true,plan:'saathi',
+ name:'Murugan',nick:'Appa',photoV:0,userPhoto:null,
+ quests:{am:true,bf:true,ln:false,wk:false,pm:false},bloom:null,
+ doses:{am:'8:10 am',pm:null},tabletDays:64,
+ meals:{bf:SAMPLE.bf.map(([id,qty])=>({id,qty}))},
+ slot:'ln',draft:null,
+ gifts:3,giftLog:[],
+ shield:{eyes:'due',kidney:'done',feet:'done',mood:'due',bp:'flag',fats:'done'},
+ stamps:7,labFree:1,refill:'idle',carePrompt:'open',notNow:0,
+ dexNew:null,
+ detective:{step:0,before:112,guess:50,after:null,dish:'idli'},
+ plate:{order:[],done:false},
+ walk:{running:false,t:600,withLakshmi:true,done:false},
+ setup:{step:0,age:'45-60',clips:[null,null,null,null,null],dishes:['idli','dosa','rice','sambar','kootu','poriyal','curd','coffee'],scanned:false,anchors:{wake:'6:00',coffee:'7:15',lunch:'1:00',dinner:'8:00'},circle:{divya:true,lakshmi:true,aadhi:false},consent:{readings:true,meds:true,postcard:true,doctor:true}},
+ postcardOK:false,familyHearts:2,challenge:4,
+ counter:{queue:[{id:1,n:'Murugan S.',m:['Metformin 500','Glimepiride 1','Atorvastatin 10'],d:5,st:0,mp:680,mrp:800},{id:2,n:'Kamala R.',m:['Metformin 500','Telmisartan 40'],d:3,st:1,mp:510,mrp:600},{id:3,n:'Subbu P.',m:['Glimepiride 2'],d:6,st:0,mp:240,mrp:280}],bpS:112,bpD:78,sug:118,earn:11040,members:84},
+ moodQ:0,moodA:[],mood:null,pushed:false,hold:null,
+ nudges:[],
+};
+const $=(s,r=document)=>r.querySelector(s);
+const A=(a,g)=>`data-act="${a}"${g!==undefined?` data-arg="${g}"`:''}`;
+const ACT={},HOLD={},SCREENS={},SHEETS={};
+
+/* ---------- Helpers ---------- */
+function greet(){const h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening'}
+function nextQuest(){return QUESTS.find(q=>!S.quests[q.id])}
+function petals(){return Object.values(S.quests).filter(Boolean).length}
+function toast(msg,ic){const h=$('#toasts');const e=document.createElement('div');e.className='toast';e.innerHTML=(ic?ico(ic,18):'')+`<span>${msg}</span>`;h.appendChild(e);setTimeout(()=>e.remove(),2700)}
+function earn(n,why){
+  const before=levelOf(S.hearts);S.hearts+=n;hearts(Math.min(5,Math.ceil(n/8)));chime('pop');toast(`+${n} hearts${why?' · '+why:''}`,'heart');
+  const after=levelOf(S.hearts);if(after>before){setTimeout(()=>{confetti();chime('win');sheet('levelup',after)},700)}
+}
+function doneQuest(id){
+  if(S.quests[id])return;S.quests[id]=true;S.bloom=id;const q=QUESTS.find(x=>x.id===id);earn(q.hr,q.t);
+  if(petals()===5)setTimeout(()=>{confetti(70);chime('win');S.gifts++;sheet('daydone')},1100);
+}
+function back(){S.stack.pop();render()}
+function open(name,p){S.stack.push({name,p});render()}
+function sheet(name,p){S.sheet={name,p};render()}
+function closeSheet(){S.sheet=null;render()}
+function tabTo(t){S.tab=t;S.stack=[];S.sheet=null;render();const sc=$('#screen .scroll');if(sc)sc.scrollTop=0}
+function playVoice(i){
+  const pool=VOICES;const v=i!==undefined?pool[i]:pool[Math.floor(Math.random()*pool.length)];
+  S.voice=v;chime('soft');render();clearTimeout(S._vt);S._vt=setTimeout(()=>{S.voice=null;render()},3600);
+}
+function head(title,opts={}){
+  return `<div class="ovhead"><button class="iconbtn" ${A('back')} aria-label="Back">${ico('chevL')}</button><div class="t">${title}</div>${opts.right||''}</div>`;
+}
+function tabbar(items,active,act='tab'){
+  return `<nav class="tabbar" aria-label="Main">${items.map(t=>`<button class="tab ${t.c?'center':''} ${active===t.id?'on':''}" ${A(act,t.id)}>${t.c?`<span class="bub">${ico(t.i)}</span>`:ico(t.i)}<span>${t.l}</span></button>`).join('')}</nav>`;
+}
+function toggle(on,act,arg,locked){return `<button class="toggle ${on?'on':''} ${locked?'locked':''}" ${locked?'':A(act,arg)} role="switch" aria-checked="${!!on}" aria-label="toggle"></button>`}
+function bar(p,cls=''){return `<div class="bar ${cls}"><i style="width:${Math.max(0,Math.min(100,p))}%"></i></div>`}
+function heartsPill(){return `<button class="hearts" ${A('sheet','hearts')} aria-label="${S.hearts} hearts">${ico('heart',18,'fill')}<span class="num">${S.hearts}</span></button>`}
+function dishCard(d,extra='',cls=''){const s=d.s||'u';return `<button class="dish ${s} ${cls}" ${extra}><span class="cdot"></span><div class="em">${d.e}</div><b>${d.n}</b><small>${d.s?`+${d.r} mg/dL`:'Not decoded yet'}</small></button>`}
+function cbadge(c){return `<span class="cbadge ${c}">${{g:'Green',y:'Yellow',r:'Red',u:'New'}[c]}</span>`}
+
+/* ---------- Render ---------- */
+let lastDepth=0;
+function roleView(){
+  if(!S.role)return SCREENS.welcome();
+  if(S.role==='helper')return VIEWS.helper();
+  if(S.role==='chemist')return VIEWS.chemist();
+  if(S.mode==='easy')return VIEWS.easyHome();
+  const v={home:S.mode==='busy'?VIEWS.busyHome:VIEWS.home,plate:VIEWS.plate,journey:VIEWS.journey,care:VIEWS.care,family:VIEWS.family}[S.tab];
+  return `<div class="view" id="v-${S.tab}">${v()}</div>`+tabbar([{id:'home',i:'home',l:'Home'},{id:'plate',i:'plate',l:'Plate'},{id:'journey',i:'path',l:'Journey',c:1},{id:'care',i:'shield',l:'Care'},{id:'family',i:'users',l:'Family'}],S.tab);
+}
+function render(){
+  const keep={};document.querySelectorAll('.scroll,.sbody').forEach(e=>{keep[e.dataset.k||e.parentElement.id||e.className]=e.scrollTop});
+  const scr=$('#screen'),ov=$('#overlay'),sh=$('#sheet'),vh=$('#voice');
+  scr.innerHTML=roleView();
+  const top=S.stack[S.stack.length-1];
+  if(top){const fresh=S.stack.length>lastDepth;ov.innerHTML=`<div class="overlay ${fresh?'in':''}" id="ov-${top.name}">${SCREENS[top.name](top.p)}</div>`}else ov.innerHTML='';
+  lastDepth=S.stack.length;
+  sh.innerHTML=S.sheet?`<div class="shade" ${A('closeSheet')}></div><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div class="sbody">${SHEETS[S.sheet.name](S.sheet.p)}</div></div>`:'';
+  vh.innerHTML=S.voice?voiceHTML():'';
+  document.querySelectorAll('.scroll,.sbody').forEach(e=>{const k=e.dataset.k||e.parentElement.id||e.className;if(keep[k])e.scrollTop=keep[k]});
+  const side=$('#side');if(side&&!side._built){side.innerHTML=demoPanel();side._built=1}else if(side)side.innerHTML=demoPanel();
+  S.bloom=null;
+  document.dispatchEvent(new Event('rendered'));
+}
+function voiceHTML(){const v=S.voice,p=PEOPLE[v.who];return `<div class="voicebox" ${A('closeVoice')}><div class="voicecard">${avatar(v.who,88,'#C9E0BF')}<div class="tiny" style="margin-top:10px">A voice from ${p.name}</div><div class="wave">${'<i></i>'.repeat(17)}</div><div class="hand" style="font-size:27px;line-height:1.15;color:var(--g700)">“${v.text}”</div><div class="pill gold" style="margin-top:14px">${ico('heart',14,'fill')} Family voice</div></div></div>`}
+
+/* ---------- Events ---------- */
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el)return;
+  const f=ACT[el.dataset.act];if(!f){console.warn('no act',el.dataset.act);return}
+  e.stopPropagation();f(el.dataset.arg,el,e);
+});
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.petal')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}});
+document.addEventListener('pointerdown',e=>{const el=e.target.closest('[data-hold]');if(!el)return;S.hold=el.dataset.hold;HOLD[S.hold]&&HOLD[S.hold].down(el,e)});
+['pointerup','pointercancel'].forEach(t=>document.addEventListener(t,e=>{if(S.hold){const h=S.hold;S.hold=null;HOLD[h]&&HOLD[h].up()}}));
+document.addEventListener('input',e=>{const b=e.target.dataset&&e.target.dataset.bind;if(!b)return;const p=b.split('.');let o=S;for(let i=0;i<p.length-1;i++)o=o[p[i]];o[p[p.length-1]]=e.target.type==='range'?+e.target.value:e.target.value;if(e.target.dataset.live)render()});
+
+/* ---------- Shared actions ---------- */
+Object.assign(ACT,{
+ back,closeSheet,closeVoice(){clearTimeout(S._vt);S.voice=null;render()},
+ tab(t){tabTo(t)},
+ open(a){open(a)},sheet(a){sheet(a)},
+ photoTap(){playVoice()},
+ petal(id){const q=QUESTS.find(x=>x.id===id);if(S.quests[id]){toast('Petal bloomed. Nice.','check');return}if(q.act==='log')S.slot=q.arg;open(q.act,q.arg)},
+ toggleSound(){S.sound=!S.sound;render()},
+ setMode(m){S.mode=m;S.tab='home';S.stack=[];S.sheet=null;render()},
+ toast(m){toast(m,'check')},
+});
+
+const VIEWS={};
+const DOSES=[{id:'am',t:'Morning tablets',when:'After your coffee',pills:['Metformin 500 mg','Glimepiride 1 mg']},{id:'pm',t:'Night tablets',when:'After dinner',pills:['Metformin 500 mg','Atorvastatin 10 mg']}];
+
+/* ---------- Welcome ---------- */
+SCREENS.welcome=()=>`<div class="view"><div class="scroll" style="padding-top:26px"><div class="stack s20">
+  <div class="center"><div class="kolam" style="width:min(78%,240px)">${kolamSVG({am:1,bf:1,ln:1,wk:1,pm:1})}</div>
+  <div class="h1" style="margin-top:6px;font-size:44px">Pulse</div><p class="muted" style="font-size:16px;margin-top:2px">Diabetes care that feels like home</p></div>
+  <div class="stack s10">
+   <button class="welcome-door" ${A('enter','patient')}>${avatar('murugan',56)}<div class="grow"><div class="h3">I am Murugan</div><div class="muted">Open my home screen</div></div>${ico('chevR')}</button>
+   <button class="welcome-door" ${A('enter','helper')}>${avatar('divya',56)}<div class="grow"><div class="h3">I am Divya, his daughter</div><div class="muted">Set up Appa's home in 15 minutes</div></div>${ico('chevR')}</button>
+   <button class="welcome-door" ${A('enter','chemist')}>${avatar('raj',56)}<div class="grow"><div class="h3">I run a chemist counter</div><div class="muted">Open Counter Mode</div></div>${ico('chevR')}</button>
+  </div>
+  <div class="center"><button class="link" ${A('openDemo')}>Open demo director</button></div><div class="center tiny">Prototype · Type 2 diabetes · Coimbatore · Every number here is an example</div>
+</div></div></div>`;
+
+/* ---------- Standard home ---------- */
+VIEWS.home=()=>{
+  const nq=nextQuest(),lv=levelOf(S.hearts),nx=LEVELS[lv+1];
+  const wk=[['Mon',5],['Tue',5],['Wed',4],['Thu','rest'],['Fri',petals()],['Sat','f'],['Sun','f']];
+  return `<div class="topbar"><button ${A('sheet','me')} aria-label="Settings and profile">${avatar('murugan',46,'#C9E0BF')}</button><div class="grow"><div class="hello">${greet()}, ${S.nick}</div><div class="sub">Day ${S.day} of 90</div></div>${heartsPill()}<button class="iconbtn" ${A('open','inbox')} aria-label="Nudges">${ico('bell')}<i class="dot"></i></button></div>
+  <div class="scroll has-tab" data-k="home"><div class="stack s20">
+   <div><div class="kolam">${kolamSVG(S.quests,{bloom:S.bloom})}</div>
+   <div class="center tiny" style="margin-top:-2px">Tap the photo to hear your family</div></div>
+   ${nq?`<button class="btn block gold" ${A('petal',nq.id)} style="font-size:17px">${ico(nq.ic,22)}<span>${nq.t}</span><span class="reward" style="color:#4a3200;margin-left:6px">+${nq.hr} ${ico('heart',15,'fill')}</span></button>`
+        :`<button class="btn block gold" ${A('sheet','daydone')}>${ico('gift',22)} Open today's gift</button>`}
+   <div class="stack s8"><div class="sec"><div class="h2">Today's petals</div><span class="tiny">${petals()}/5</span></div>
+    ${QUESTS.map(q=>{const d=S.quests[q.id],n=nq&&nq.id===q.id;return `<button class="quest ${d?'done':''} ${n?'next':''}" ${A('petal',q.id)}><span class="qi">${ico(d?'check':q.ic,22)}</span><span class="grow"><b>${q.t}</b><small>${d&&q.id==='am'?'Taken at '+S.doses.am:d?'Done':q.s}</small></span>${d?'':`<span class="reward">+${q.hr} ${ico('heart',15,'fill')}</span>`}</button>`}).join('')}
+   </div>
+   <div class="card"><div class="row between" style="margin-bottom:8px"><div class="h3">This week's kolam</div><span class="tiny">Rest days stay in the pattern</span></div>
+    <div class="week">${wk.map(([d,n])=>`<div class="d">${n==='rest'?flower(0,'rest'):n==='f'?flower(0,'future'):flower(n,'part')}${d}</div>`).join('')}</div></div>
+   <button class="card tint row" ${A('familyHeart')} style="text-align:left;width:100%">${avatar('divya',46)}<div class="grow"><b>Divya sent you a heart</b><div class="muted">From Bengaluru, 20 minutes ago</div></div><span class="pill gold">${ico('heart',14,'fill')} Send back</span></button>
+   <button class="card row" ${A('goDex')} style="text-align:left;width:100%"><div style="font-size:38px">🍚</div><div class="grow"><div class="h3">12 of 24 dishes decoded</div><div class="muted">Rice is still your red card. Two more checks and we find the portion that works.</div>${bar(50,'thin')}</div></button>
+   <button class="card tint row" ${A('tab','journey')} style="text-align:left;width:100%">${banyan(lv,84)}<div class="grow"><div class="tiny">Your Family Banyan</div><div class="h3">${LEVELS[lv].n}</div>${nx?`<div class="muted">${nx.min-S.hearts} hearts to ${nx.n}</div>${bar((S.hearts-LEVELS[lv].min)/(nx.min-LEVELS[lv].min)*100)}`:''}</div></button>
+   <div class="row" style="gap:10px">
+    <button class="card gold row grow" ${A('open','gifts')} style="padding:12px;text-align:left">${ico('gift',26)}<div><b>${S.gifts} gifts</b><div class="tiny" style="color:var(--gold2)">Scratch to open</div></div></button>
+    <button class="card row grow" ${A('sheet','festival')} style="padding:12px;text-align:left"><span style="font-size:26px">🪔</span><div><b>Deepavali Plate</b><div class="tiny">Sweets, sorted</div></div></button>
+   </div>
+  </div></div>`;
+};
+
+/* ---------- Easy home ---------- */
+VIEWS.easyHome=()=>{
+  const doneAll=S.quests.am&&S.quests.pm,dn=DOSES.find(d=>!S.doses[d.id]);
+  return `<div class="view easy"><div class="topbar"><div class="grow"><div class="hello">${greet()}, ${S.nick}</div><div class="sub" style="font-size:16px">Day ${S.day} of 90</div></div>${heartsPill()}<button class="iconbtn" ${A('sheet','me')} aria-label="More">${ico('settings')}</button></div>
+  <div class="scroll" data-k="easy"><div class="stack s20">
+   <div class="kolam" style="width:min(100%,265px)">${kolamSVG(S.quests,{bloom:S.bloom})}</div>
+   <div class="big3">
+    <button class="bigbtn ${doneAll?'done':''}" ${A('open','meds')}><span class="bi">${ico('pill')}</span><span>Medicine<small>${dn?dn.t+' · tap when taken':'All taken today. Well done.'}</small></span></button>
+    <button class="bigbtn" ${A('open','log')}><span class="bi">${ico('mic')}</span><span>Food<small>Hold the button and speak</small></span></button>
+    <button class="bigbtn ${S.mood?'done':''}" ${A('open','feel')}><span class="bi">${ico('smile')}</span><span>How I feel<small>${S.mood?'Thank you for telling us':'Tell us in one tap'}</small></span></button>
+   </div>
+   <button class="btn block soft" ${A('callDivya')}>${ico('call',24)} Call Divya</button>
+   <button class="btn block ghost" ${A('open','safety')} style="color:var(--coral);border-color:#F3B9AD">I feel unwell</button>
+  </div></div></div>`;
+};
+SCREENS.feel=()=>`${head('How do you feel?')}<div class="scroll"><div class="stack s20"><p class="muted" style="font-size:18px">One tap is enough. No one is judging.</p>
+ ${[['😊','Good','Wonderful. Keep going.'],['😐','Okay','Thank you for telling us. Rest well.'],['😔','Not good','We are here. The care team will call you today.']].map(([e,t,m])=>`<button class="bigbtn" ${A('feel',t+'|'+m)} style="display:flex;align-items:center;gap:16px;padding:20px;border-radius:28px;background:var(--g50);border:2.5px solid var(--g200);font-family:var(--display);font-weight:700;font-size:28px;width:100%"><span style="font-size:48px">${e}</span>${t}</button>`).join('')}</div></div>`;
+ACT.feel=(a)=>{const [t,m]=a.split('|');S.mood=t;S.stack=[];render();toast(m,'heart');if(t==='Good')earn(5,'How I feel')};
+ACT.callDivya=()=>toast('Calling Divya... (demo)','call');
+
+/* ---------- Busy home ---------- */
+VIEWS.busyHome=()=>`<div class="topbar"><div class="grow"><div class="hello">Hi, ${S.name}</div><div class="sub">Busy Mode · family features are off</div></div><button class="iconbtn" ${A('sheet','me')} aria-label="Settings">${ico('settings')}</button></div>
+ <div class="scroll has-tab" data-k="busy"><div class="stack">
+  <div class="grid2"><div class="stat"><b>118</b><small>Last reading, 7:40 am</small></div><div class="stat"><b>+32</b><small>Rise after breakfast</small></div></div>
+  <div class="card tint"><div class="row between"><div class="h3">Today</div><span class="pill">${petals()} of 5 done</span></div>
+   <div class="row" style="margin:12px 0 4px;gap:8px">${QUESTS.map(q=>`<button class="grow" ${A('petal',q.id)} style="height:46px;border-radius:14px;display:grid;place-items:center;background:${S.quests[q.id]?'var(--g500)':'#fff'};color:${S.quests[q.id]?'#fff':'var(--g600)'};border:2px solid ${S.quests[q.id]?'var(--g500)':'var(--g200)'}" aria-label="${q.t}">${ico(S.quests[q.id]?'check':q.ic,20)}</button>`).join('')}</div></div>
+  <div class="sec"><div class="h2">Quick log</div></div>
+  <div class="grid3"><button class="card center" ${A('open','snap')} style="padding:16px 8px">${ico('camera',28)}<div style="font-weight:900;margin-top:6px">Snap</div></button><button class="card center" ${A('open','log')} style="padding:16px 8px">${ico('mic',28)}<div style="font-weight:900;margin-top:6px">Say it</div></button><button class="card center" ${A('sameYest')} style="padding:16px 8px">${ico('rotate',28)}<div style="font-weight:900;margin-top:6px">Same as yesterday</div></button></div>
+  <button class="card row" ${A('open','meds')} style="text-align:left;width:100%">${ico('pill',28)}<div class="grow"><b>Night tablets</b><div class="muted">Due after dinner · discreet reminder</div></div>${ico('chevR')}</button>
+  <button class="card row" ${A('goDex')} style="text-align:left;width:100%"><span style="font-size:32px">🍚</span><div class="grow"><b>Rice is your red dish</b><div class="muted">1 cup instead of 2 cuts the rise by about 30</div></div>${ico('chevR')}</button>
+  <div class="card tint"><div class="row">${ico('phone',26)}<div class="grow"><b>Home-screen widget</b><div class="muted">Log lunch from your lock screen in one tap.</div></div></div></div>
+  <button class="btn block ghost" ${A('setMode','standard')}>Turn on family features</button>
+ </div></div>`;
+
+/* ---------- Medicine Buddy ---------- */
+SCREENS.meds=()=>{
+  const nextD=DOSES.find(d=>!S.doses[d.id]);
+  return `${head('Medicine Buddy')}<div class="scroll"><div class="stack">
+  ${DOSES.map(d=>{const t=S.doses[d.id];return `<div class="card ${t?'tint':'shadow'}"><div class="row"><div class="qi" style="width:48px;height:48px;border-radius:16px;background:${t?'var(--g500)':'var(--gold)'};color:${t?'#fff':'#4a3200'};display:grid;place-items:center">${ico(t?'check':d.id==='am'?'sun':'moon',26)}</div><div class="grow"><div class="h3">${d.t}</div><div class="muted">${d.when}</div></div>${t?`<span class="pill">Taken ${t}</span>`:''}</div>
+   <div class="chips" style="margin:12px 0">${d.pills.map(p=>`<span class="pill line">${ico('pill',14)} ${p}</span>`).join('')}</div>
+   ${t?`<button class="btn soft block" ${A('replay')}>${ico('volume')} Hear it again</button>`:`<button class="btn block" ${A('take',d.id)} style="min-height:58px;font-size:18px">${ico('check',24)} I took them</button>`}</div>`}).join('')}
+  ${nextD?`<div class="calm">${ico('heart',16,'fill')} Every time you tap, a voice from your family plays. A different one each time.</div>`:''}
+  <div class="card"><div class="row between"><div class="h3">Tablet jar</div><span class="pill gold">${S.tabletDays} of 100 days</span></div>
+   <div class="row" style="margin:12px 0;gap:14px"><svg viewBox="0 0 60 70" width="64" height="74"><rect x="8" y="4" width="44" height="10" rx="4" fill="#C9E0BF"/><path d="M12 14h36v44a8 8 0 0 1-8 8H20a8 8 0 0 1-8-8z" fill="#F3F8F0" stroke="#C9E0BF" stroke-width="3"/><g>${Array.from({length:12},(_,i)=>`<ellipse cx="${20+(i%4)*7}" cy="${58-Math.floor(i/4)*7}" rx="3.4" ry="2.2" fill="${['#F0AE1B','#E0614A','#5B964A'][i%3]}" transform="rotate(${i*25} ${20+(i%4)*7} ${58-Math.floor(i/4)*7})"/>`).join('')}</g></svg>
+   <div class="grow">${bar(S.tabletDays,'gold')}<div class="muted" style="margin-top:8px">At 100 days, Aadhi unlocks a special clip for you. A missed day never resets the jar.</div></div></div></div>
+  <div class="card ${S.refill==='packed'?'tint':''}"><div class="row"><div class="qi" style="width:46px;height:46px;border-radius:14px;background:var(--g100);color:var(--g700);display:grid;place-items:center">${ico('store',24)}</div><div class="grow"><div class="h3">Refill Ready</div><div class="muted">Metformin runs out in 5 days</div></div></div>
+   ${bar(S.refill==='packed'?100:35,'thin')}
+   <div class="row" style="margin:12px 0"><div class="grow"><b>Sri Murugan Medicals</b><div class="tiny">Pulse point · 350 m · open till 9:30 pm</div></div><div style="text-align:right"><div class="h3" style="color:var(--g700)">₹680</div><div class="tiny" style="text-decoration:line-through">₹800</div></div></div>
+   ${S.refill==='idle'?`<button class="btn block" ${A('refill')}>Ask them to pack it</button>`:S.refill==='packed'?`<div class="pill" style="width:100%;justify-content:center;padding:12px">${ico('check',16)} Packed. Pick up today or ask for delivery.</div>`:''}
+   <div class="center" style="margin-top:10px"><button class="link" ${A('toast','Showing nearby pharmacies (demo)')}>Use another pharmacy</button></div></div>
+  <div class="tiny center" style="padding:6px 20px">Only your doctor can change a dose. <button class="link" ${A('open','chat')}>Message the care team</button></div>
+  </div></div>`;
+};
+ACT.take=(id)=>{if(S.doses[id]){playVoice();return}S.doses[id]=new Date().toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'}).toLowerCase();doneQuest(id);S.tabletDays=Math.min(100,S.tabletDays+1);playVoice();confetti(18)};
+ACT.replay=()=>playVoice();
+ACT.refill=()=>{S.refill='asked';render();setTimeout(()=>{S.refill='packed';earn(10,'Refill on time');toast('Sri Murugan Medicals packed your order','store');},1100)};
+ACT.familyHeart=()=>{hearts(8);chime('pop');S.familyHearts++;toast('Sent a heart to Divya','heart')};
+ACT.goDex=()=>{S.tab='plate';S.plateTab='dex';S.stack=[];render()};
+ACT.enter=(r)=>{S.role=r;S.tab='home';S.stack=[];if(r==='helper'){S.htab='today';S.setup.step=0;S.stack=[{name:'setup'}];}render();if(r==='patient'&&!S.pushed){S.pushed=1;setTimeout(()=>pushNudge(S.quests.am?'lunch':'am'),5500)}};
+
+/* ---------- Walk ---------- */
+SCREENS.walk=()=>{const w=S.walk,m=Math.floor(w.t/60),s=w.t%60,pct=(600-w.t)/600;const C=2*Math.PI*96;
+ return `${head('Walk after dinner')}<div class="scroll"><div class="stack s20 center">
+  <div class="calm" style="text-align:left">${ico('rain',16)} Raining outside? Ten minutes walking inside the house counts too.</div>
+  <div style="position:relative;width:240px;height:240px;margin:0 auto"><svg viewBox="0 0 240 240" width="240" height="240"><circle cx="120" cy="120" r="96" fill="none" stroke="#E3EFDD" stroke-width="16"/><circle cx="120" cy="120" r="96" fill="none" stroke="${w.done?'#F0AE1B':'#5B964A'}" stroke-width="16" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct)}" transform="rotate(-90 120 120)" style="transition:stroke-dashoffset .2s linear"/></svg>
+   <div style="position:absolute;inset:0;display:grid;place-items:center"><div><div class="big-num" style="font-size:54px">${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}</div><div class="tiny">${w.done?'Walk complete':w.running?'Walking... '+Math.round(pct*1180)+' steps':'minutes left'}</div></div></div></div>
+  <div class="card tint row" style="text-align:left">${avatar('lakshmi',44)}<div class="grow"><b>Walk with Lakshmi amma</b><div class="muted">Walking together earns double hearts</div></div>${toggle(w.withLakshmi,'walkTog')}</div>
+  <div class="tip" style="text-align:left">${ico('drop',18)}<span>Your dinner rises about <b>+68</b> without a walk. With a 10-minute walk it usually stays near <b>+38</b>.</span></div>
+  ${w.done?`<button class="btn block gold" ${A('back')}>Lovely. Back home</button>`:`<button class="btn block" ${A('walkGo')} style="min-height:58px;font-size:18px">${w.running?'Walking...':'Start walking'}</button><div class="tiny">Prototype speeds this up so 10 minutes takes 10 seconds.</div>`}
+ </div></div>`};
+ACT.walkTog=()=>{S.walk.withLakshmi=!S.walk.withLakshmi;render()};
+ACT.walkGo=()=>{const w=S.walk;if(w.running)return;w.running=true;w.t=600;w.done=false;render();
+ const iv=setInterval(()=>{w.t-=12;if(w.t<=0){w.t=0;w.running=false;w.done=true;clearInterval(iv);doneQuest('wk');if(w.withLakshmi)setTimeout(()=>earn(10,'Walked together'),900);confetti(40);chime('win')}
+  if(S.stack.length&&S.stack[S.stack.length-1].name==='walk')render();else{if(!w.done){clearInterval(iv);w.running=false}}},200)};
+
+/* ---------- Sheets: hearts, level up, day done, festival ---------- */
+SHEETS.hearts=()=>{const lv=levelOf(S.hearts);return `<div class="stack"><div class="center">${banyan(lv,110)}<div class="h1" style="font-size:34px">${S.hearts} hearts</div><p class="muted">Hearts grow your Family Banyan. They never go down and nothing breaks if you skip a day.</p></div>
+ <div class="card tint stack s8">${[['Tablet taken',10],['Meal logged',15],['Walk after dinner',20],['Two-Prick Check',25],['Kolam complete',30],['Family walk together',10]].map(([t,n])=>`<div class="row between"><span>${t}</span><span class="reward" style="margin:0">+${n} ${ico('heart',15,'fill')}</span></div>`).join('')}</div>
+ <div class="stack s8">${LEVELS.map((l,i)=>`<div class="row"><span class="pill ${S.hearts>=l.min?'':'line'}">${S.hearts>=l.min?ico('check',14):ico('lock',14)}</span><b class="grow" style="${S.hearts>=l.min?'':'color:var(--ink3)'}">${l.n}</b><span class="tiny">${l.min} hearts</span></div>`).join('')}</div></div>`};
+SHEETS.levelup=(l)=>`<div class="center stack">${banyan(l,150)}<div class="tiny">Your Family Banyan grew</div><div class="h1">${LEVELS[l].n}</div><p class="muted">Divya and Lakshmi can see it on their phones. A special voice is waiting for you.</p><button class="btn block" ${A('levelOK')}>Hear it</button></div>`;
+ACT.levelOK=()=>{S.sheet=null;playVoice()};
+SHEETS.daydone=()=>`<div class="center stack"><div class="kolam" style="width:230px">${kolamSVG({am:1,bf:1,ln:1,wk:1,pm:1})}</div><div class="h1" style="font-size:30px">Today's kolam is complete</div><p class="muted">All five petals bloomed. Divya gets a small note tonight: "Appa finished his kolam".</p>
+ <div class="card gold row" style="text-align:left">${ico('gift',32)}<div class="grow"><b>+30 hearts and a scratch card</b><div class="muted">Waiting in your gifts</div></div></div><button class="btn block gold" ${A('daydoneGo')}>Scratch it now</button><button class="btn block ghost" ${A('closeSheet')}>Later</button></div>`;
+ACT.daydoneGo=()=>{S.sheet=null;earn(30,'Kolam complete');open('gifts')};
+SHEETS.festival=()=>`<div class="stack"><div class="center"><div style="font-size:54px">🪔</div><div class="h1" style="font-size:30px">Deepavali Plate</div><p class="muted">Enjoy it. Here is how, using your own numbers.</p></div>
+ ${[['🍬','Sweets','Half a piece of mysore pak after the meal, not before. Your payasam test says +58 as a full bowl.'],['🍛','The feast','Start with vegetables and dal. Then your 1 cup of rice.'],['🚶','The walk','A slow family walk after the meal lowers the rise. Take Aadhi along.']].map(([e,t,d])=>`<div class="card row top"><div style="font-size:30px">${e}</div><div><b>${t}</b><div class="muted">${d}</div></div></div>`).join('')}
+ <p class="tiny center">No guilt on the days that matter most.</p><button class="btn block" ${A('closeSheet')}>Got it</button></div>`;
+
+S.plateTab='log';S.dexF='all';S.detective.dish='upma';S.snap=null;S.say='idle';
+const TRUTH={upma:44,rasam:8,fish:6,chicken:8,egg:4,lemon:58,curdrice:36,biryani:82,vada:49,payasam:71,banana:38,tea:26};
+const decoded=()=>DISHES.filter(d=>d.s).length;
+
+VIEWS.plate=()=>{
+  const t=S.plateTab;
+  return `<div class="topbar"><div class="grow"><div class="hello">Plate</div><div class="sub">Same kitchen, smarter plate</div></div>${heartsPill()}</div>
+  <div style="padding:0 18px 10px"><div class="seg">${[['log','Log'],['dex','Dish Dex'],['plan','My Plate']].map(([k,l])=>`<button class="${t===k?'on':''}" ${A('plateTab',k)}>${l}</button>`).join('')}</div></div>
+  <div class="scroll has-tab" data-k="plate-${t}"><div class="stack">${t==='log'?plateLog():t==='dex'?plateDex():plateMy()}</div></div>`;
+};
+ACT.plateTab=(k)=>{S.plateTab=k;render()};
+
+/* ----- Say It ----- */
+function sayIt(big){
+  return `<div class="card shadow center stack s10" style="padding:${big?'28px 18px':'18px'}">
+   <div class="chips" style="justify-content:center">${Object.entries(SLOTS).map(([k,l])=>`<button class="chip ${S.slot===k?'on':''}" ${A('slot',k)}>${l}</button>`).join('')}</div>
+   <div class="micwrap" data-hold="say" id="mic"><i class="ring"></i><i class="ring"></i><button class="mic" aria-label="Hold to speak your meal">${ico('mic')}</button></div>
+   <div id="sayStatus" class="h3" style="min-height:28px;color:var(--g700)">Hold and say what you ate</div>
+   <div class="tiny">Speak the way you talk. Pulse reads it back for one tap.</div></div>`;
+}
+ACT.slot=(k)=>{S.slot=k;render()};
+HOLD.say={t0:0,down(el){this.t0=Date.now();el.classList.add('live');const st=$('#sayStatus');if(st)st.innerHTML='Listening<span class="num">...</span>'},
+ up(){const el=$('#mic'),st=$('#sayStatus');if(!el)return;el.classList.remove('live');
+  if(Date.now()-this.t0<450){if(st)st.textContent='Hold the button while you speak';return}
+  const txt=SAYTEXT[S.slot];let i=0;const iv=setInterval(()=>{i+=2;if(st)st.textContent='“'+txt.slice(0,i)+(i<txt.length?'':'”');if(i>=txt.length){clearInterval(iv);setTimeout(()=>{S.draft={slot:S.slot,items:SAMPLE[S.slot].map(([id,qty])=>({id,qty})),src:'voice'};sheet('meal')},450)}},35)}};
+
+function plateLog(){
+  const meals=Object.entries(S.meals);
+  return `${sayIt()}
+  <div class="grid3">
+   <button class="card center" ${A('open','snap')} style="padding:16px 6px">${ico('camera',28)}<div style="font-weight:900;margin-top:6px">Snap plate</div></button>
+   <button class="card center" ${A('menuOpen')} style="padding:16px 6px">${ico('plate',28)}<div style="font-weight:900;margin-top:6px">Family menu</div></button>
+   <button class="card center" ${A('sameYest')} style="padding:16px 6px">${ico('rotate',28)}<div style="font-weight:900;margin-top:6px">Same as yesterday</div></button></div>
+  <button class="card gold row" ${A('openDetective')} style="text-align:left;width:100%"><div style="font-size:36px">🔍</div><div class="grow"><div class="tiny" style="color:var(--gold2)">TODAY'S MISSION · +25 hearts</div><div class="h3">Sugar Detective</div><div class="muted">Guess what upma does to your sugar, then find out.</div></div>${ico('chevR')}</button>
+  <div class="sec"><div class="h2">Today's meals</div></div>
+  ${meals.length?meals.map(([k,items])=>`<div class="card"><div class="row between"><b>${SLOTS[k]}</b><span class="pill">+${expect(items)} expected</span></div><div class="row wrap" style="margin-top:8px;gap:8px">${items.map(it=>`<span class="row" style="gap:5px">${dish(it.id).e} ${dish(it.id).n} ×${it.qty} ${cbadge(colorOf(it))}</span>`).join('')}</div></div>`).join(''):'<div class="card tint center muted">Nothing logged yet. Hold the mic and say it.</div>'}
+  <div class="tip">${ico('info',18)}<span>No calories, no grams. Pulse only needs to know the meal it is checking.</span></div>`;
+}
+ACT.sameYest=()=>{const s=S.slot==='bf'||S.slot==='ln'?S.slot:'bf';const items=SAMPLE[s].map(([id,qty])=>({id,qty:s==='ln'&&id==='rice'?1:qty}));S.meals[s]=items;toast(`Logged: same ${SLOTS[s].toLowerCase()} as yesterday`,'rotate');doneQuest(s);render()};
+
+SCREENS.log=(slot)=>{if(slot&&SLOTS[slot])S.slot=slot;return `${head('What did you eat?')}<div class="scroll"><div class="stack">${sayIt(true)}
+ <div class="grid2"><button class="btn soft" ${A('open','snap')}>${ico('camera')} Snap plate</button><button class="btn soft" ${A('menuOpen')}>${ico('plate')} Family menu</button></div></div></div>`};
+
+/* ----- Snap Plate ----- */
+SCREENS.snap=()=>{
+  const sc=S.snap==='scan';
+  return `${head('Snap your plate')}<div class="scroll"><div class="stack">
+  <div style="position:relative;border-radius:28px;overflow:hidden;aspect-ratio:1;background:#2b3a26">
+   ${S.snapImg?`<img src="${S.snapImg}" alt="Your plate" style="width:100%;height:100%;object-fit:cover">`:`<svg viewBox="0 0 300 300" width="100%" height="100%"><rect width="300" height="300" fill="#35462F"/><rect x="0" y="180" width="300" height="120" fill="#3f5237"/><circle cx="150" cy="156" r="112" fill="#F4F0E6"/><circle cx="150" cy="156" r="96" fill="#fff"/><text x="95" y="150" font-size="44">🍚</text><text x="150" y="130" font-size="38">🍛</text><text x="150" y="190" font-size="38">🥬</text><text x="98" y="196" font-size="34">🥛</text><text x="190" y="156" font-size="30">🥘</text></svg>`}
+   <div style="position:absolute;inset:14px;border:3px solid rgba(255,255,255,.85);border-radius:20px;border-style:dashed"></div>
+   ${sc?`<div style="position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(125,176,108,.55) 50%,transparent 55%);background-size:100% 200%;animation:scan 1.3s linear infinite"></div>
+   <div class="pill gold" style="position:absolute;left:24%;top:30%">Rice · 2 katori</div><div class="pill" style="position:absolute;left:52%;top:20%">Sambar · 1</div><div class="pill" style="position:absolute;left:52%;top:62%">Poriyal · 1</div><div class="pill" style="position:absolute;left:18%;top:64%">Curd · 1</div>`:''}
+  </div>
+  <style>@keyframes scan{from{background-position:0 -100%}to{background-position:0 100%}}</style>
+  <div class="center tiny">${sc?'Reading your plate...':'Prototype uses a sample plate. Choose a photo to try your own.'}</div>
+  <div class="row" style="gap:12px;justify-content:center"><label class="btn soft sm" for="snapfile" style="cursor:pointer">${ico('plus',18)} Choose photo</label><input id="snapfile" type="file" accept="image/*" style="position:absolute;opacity:0;width:1px;height:1px">
+  <button class="btn" ${A('shutter')} style="min-height:64px;width:64px;padding:0;border-radius:50%" aria-label="Take photo">${ico('camera',28)}</button></div>
+  </div></div>`;
+};
+ACT.shutter=()=>{S.snap='scan';render();chime('pop');setTimeout(()=>{S.snap=null;S.stack=[];S.draft={slot:S.slot==='bf'?'ln':S.slot,items:SAMPLE.ln.map(([id,qty])=>({id,qty})),src:'photo'};S.slot=S.draft.slot;S.tab='plate';sheet('meal')},1500)};
+document.addEventListener('change',e=>{if(e.target.id==='snapfile'&&e.target.files[0]){const r=new FileReader();r.onload=()=>{S.snapImg=r.result;render()};r.readAsDataURL(e.target.files[0])}
+ if(e.target.id==='photofile'&&e.target.files[0]){const r=new FileReader();r.onload=()=>{S.userPhoto=r.result;toast('Your photo is now on the home screen','heart');render()};r.readAsDataURL(e.target.files[0])}});
+
+/* ----- Family menu sheet ----- */
+ACT.menuOpen=()=>{S.draft={slot:S.slot,items:[],src:'menu'};sheet('menu')};
+SHEETS.menu=()=>{const fam=DISHES.filter(d=>S.setup.dishes.includes(d.id));const cnt=id=>(S.draft.items.find(i=>i.id===id)||{}).qty||0;
+ return `<div class="stack"><div class="h2">Tap what's on the plate</div><p class="muted">Your family's own dishes. Tap again for more.</p>
+ <div class="grid3">${fam.map(d=>`<button class="dish ${cnt(d.id)?'sel':''}" ${A('menuAdd',d.id)}>${cnt(d.id)?`<span class="cnt">${cnt(d.id)}</span>`:''}<div class="em">${d.e}</div><b>${d.n}</b></button>`).join('')}</div>
+ <button class="btn block" ${A('menuDone')} ${S.draft.items.length?'':'disabled'}>Review plate</button></div>`};
+ACT.menuAdd=(id)=>{const it=S.draft.items.find(i=>i.id===id);if(it)it.qty++;else S.draft.items.push({id,qty:1});chime('pop');render()};
+ACT.menuDone=()=>{sheet('meal')};
+
+/* ----- Meal confirm sheet ----- */
+SHEETS.meal=()=>{
+  const d=S.draft,it=d.items,ex=expect(it),c=ex<40?'g':ex<65?'y':'r',rice=it.find(i=>i.id==='rice'&&i.qty>=2);
+  const others=['curd','poriyal','sambar','kootu','coffee'].filter(id=>!it.find(i=>i.id===id)).slice(0,4);
+  return `<div class="stack"><div><div class="tiny">${d.src==='voice'?'I heard':d.src==='photo'?'I see':'You picked'} · ${SLOTS[d.slot]}</div><div class="h2">Is this right?</div></div>
+  <div class="stack s8">${it.map((x,i)=>`<div class="card row" style="padding:10px 12px"><span style="font-size:30px">${dish(x.id).e}</span><div class="grow"><b>${dish(x.id).n}</b> ${cbadge(colorOf(x))}<div class="tiny">${x.qty} ${unit(x)}${x.qty>1&&unit(x)!=='serving'?'s':''}</div></div><div class="stepper sm"><button ${A('mq',i+'|-1')} aria-label="Less">−</button><button ${A('mq',i+'|1')} aria-label="More">+</button></div></div>`).join('')}</div>
+  ${others.length?`<div class="chips"><span class="tiny" style="align-self:center">Add</span>${others.map(id=>`<button class="chip" ${A('madd',id)}>${dish(id).e} ${dish(id).n}</button>`).join('')}</div>`:''}
+  <div class="card tint"><div class="row between"><b>Expected rise after this meal</b>${cbadge(c)}</div>
+   <div style="position:relative;height:16px;border-radius:99px;margin:12px 0 4px;background:linear-gradient(90deg,var(--g400) 0 40%,var(--yellow) 40% 65%,var(--coral) 65% 100%)"><i style="position:absolute;top:-5px;left:calc(${Math.min(ex,100)}% - 13px);width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--ink);transition:left .5s"></i></div>
+   <div class="row between tiny"><span>0</span><b style="color:var(--ink);font-size:17px">about +${ex} mg/dL</b><span>100</span></div></div>
+  ${rice?`<div class="warn row">${ico('sparkle',20)}<span class="grow">Your own readings say 2 cups of rice rise you +74. One cup is +42. Try it?</span><button class="btn sm gold" ${A('mq',it.indexOf(rice)+'|-1')}>1 cup</button></div>`:''}
+  <button class="btn block" ${A('mealOK')}>${ico('check')} Looks right</button></div>`};
+ACT.mq=(a)=>{const [i,dl]=a.split('|').map(Number);const x=S.draft.items[i];x.qty+=dl;if(x.qty<=0)S.draft.items.splice(i,1);chime('pop');render();
+  if(x.id==='rice'&&x.qty===1&&dl<0)toast('Smart. 1 cup keeps the rise near +52','sparkle')};
+ACT.madd=(id)=>{S.draft.items.push({id,qty:1});render()};
+ACT.mealOK=()=>{const d=S.draft;S.meals[d.slot]=d.items;S.sheet=null;S.draft=null;const q={bf:'bf',ln:'ln'}[d.slot];if(q&&!S.quests[q])doneQuest(q);else earn(15,SLOTS[d.slot]);
+  S.stack=[];render();setTimeout(()=>toast("We'll ask how it went in 2 hours",'clock'),1200)};
+
+/* ----- Dish Dex ----- */
+function plateDex(){
+  const f=S.dexF,list=DISHES.filter(d=>f==='all'||(f==='u'?!d.s:d.s===f)),n=decoded();
+  return `<div class="card tint"><div class="row between"><div class="h3">${n} of 24 dishes decoded</div><span class="pill gold">${ico('trophy',14)} ${n>=24?'Master':n>=18?'Expert':n>=12?'Detective':'Rookie'}</span></div>${bar(n/24*100)}<div class="muted" style="margin-top:8px">Every dish gets a colour from your own body. No generic chart.</div></div>
+  <div class="chips">${[['all','All'],['g','Green'],['y','Yellow'],['r','Red'],['u','Undecoded']].map(([k,l])=>`<button class="chip ${f===k?'on':''}" ${A('dexF',k)}>${l}</button>`).join('')}</div>
+  <div class="grid3">${list.map(d=>dishCard(d,A('dishSheet',d.id),S.dexNew===d.id?'flip':'')).join('')}</div>`;
+}
+ACT.dexF=(k)=>{S.dexF=k;render()};
+ACT.dishSheet=(id)=>sheet('dish',id);
+SHEETS.dish=(id)=>{const d=dish(id),c=d.s||'u',b=108;
+  return `<div class="stack center"><div style="font-size:64px">${d.e}</div><div class="h2">${d.n}</div>${cbadge(c)}
+  ${d.s?`<div class="card tint" style="text-align:left"><div class="row between"><span class="tiny">Before</span><b class="num">${b}</b></div>${bar(b/2.4,'thin')}<div class="row between" style="margin-top:8px"><span class="tiny">2 hours after</span><b class="num">${b+d.r}</b></div>${bar((b+d.r)/2.4,'thin')}<div class="row between" style="margin-top:8px"><span class="tiny">Rise</span><b style="color:var(--g700)">+${d.r} mg/dL</b></div></div><p class="muted">${d.tip||''}</p>
+  <button class="btn block soft" ${A('tellLakshmi')}>${ico('share')} Tell Lakshmi amma</button>`
+  :`<p class="muted">We don't know how this dish treats you yet. Eat it before a check and Pulse will decode it.</p><button class="btn block gold" ${A('detectDish',id)}>${ico('scan')} Decode it now</button>`}
+  </div>`};
+ACT.tellLakshmi=()=>{S.sheet=null;render();toast('Kitchen note sent to Lakshmi (demo)','share')};
+ACT.detectDish=(id)=>{S.detective={step:1,before:108,guess:50,after:null,dish:id};S.sheet=null;open('detective')};
+
+/* ----- Sugar Detective ----- */
+SCREENS.detective=()=>{
+  const D=S.detective,d=dish(D.dish);
+  const ticks=`<div class="ticks">${[0,1,2,3,4,5].map(i=>`<i class="${i<=D.step?'on':''}"></i>`).join('')}</div>`;
+  let body='';
+  if(D.step===0){const unk=DISHES.filter(x=>!x.s);body=`<div class="h2">Pick a mystery dish</div><p class="muted">Choose something you'll eat today. Only one check before and one after.</p><div class="grid3">${unk.map(x=>`<button class="dish u ${D.dish===x.id?'sel':''}" ${A('detDish',x.id)}><div class="em" style="filter:none">${x.e}</div><b>${x.n}</b></button>`).join('')}</div><button class="btn block" ${A('detNext')}>Start the mission</button>`}
+  if(D.step===1)body=`<div class="center stack"><div style="font-size:54px">${d.e}</div><div class="h2">Check before your first bite</div><p class="muted">Prick, read the meter, enter the number.</p><div class="big-num">${D.before}</div><div class="tiny">mg/dL before ${d.n}</div>
+   <div class="stepper"><button ${A('detB','-5')} aria-label="Lower by 5">−</button><button ${A('detB','5')} aria-label="Raise by 5">+</button></div>
+   <button class="btn soft block" ${A('detSnapMeter')}>${ico('camera')} Snap the meter instead</button><button class="btn block" ${A('detNext')}>Lock it in</button></div>`;
+  if(D.step===2)body=`<div class="center stack"><div class="h2">Your guess first</div><p class="muted">How much will ${d.n} lift your sugar in 2 hours?</p><div style="font-size:64px">${D.guess<25?'😌':D.guess<55?'🙂':D.guess<75?'😬':'😱'}</div><div class="big-num" style="color:var(--gold2)">+${D.guess}</div>
+   <input type="range" min="0" max="100" value="${D.guess}" data-bind="detective.guess" data-live="1" aria-label="Your guess"><div class="row between tiny"><span>Barely</span><span>A lot</span></div><button class="btn gold block" ${A('detNext')}>Lock my guess</button></div>`;
+  if(D.step===3)body=`<div class="center stack"><div style="font-size:54px">${d.e}</div><div class="h2">Enjoy your ${d.n.toLowerCase()}</div><p class="muted">Pulse will nudge you 2 hours after your last bite.</p>
+   <div style="position:relative;width:170px;height:170px;margin:0 auto"><svg viewBox="0 0 170 170"><circle cx="85" cy="85" r="72" fill="none" stroke="#E3EFDD" stroke-width="12"/><circle cx="85" cy="85" r="72" fill="none" stroke="#5B964A" stroke-width="12" stroke-linecap="round" stroke-dasharray="452" stroke-dashoffset="${D.waiting?0:380}" transform="rotate(-90 85 85)" style="transition:stroke-dashoffset 1.2s"/></svg><div style="position:absolute;inset:0;display:grid;place-items:center"><div class="big-num" style="font-size:36px">${D.waiting?'2:00':'1:58'}</div></div></div>
+   <button class="btn block" ${A('detSkip')}>${ico('clock')} Skip 2 hours (demo)</button></div>`;
+  if(D.step===4)body=`<div class="center stack"><div style="font-size:54px">⏱</div><div class="h2">Two hours later</div><p class="muted">One more prick. Enter the number.</p><div class="big-num">${D.after}</div><div class="tiny">mg/dL after ${d.n}</div>
+   <div class="stepper"><button ${A('detA','-5')} aria-label="Lower by 5">−</button><button ${A('detA','5')} aria-label="Raise by 5">+</button></div><button class="btn gold block" ${A('detReveal')}>Reveal the result</button></div>`;
+  if(D.step===5){const r=D.after-D.before,c=r<=35?'g':r<=60?'y':'r',off=Math.abs(r-D.guess);
+   body=`<div class="center stack"><div class="dish ${c} flip" style="width:200px;margin:0 auto;padding:22px 10px"><span class="cdot"></span><div class="em" style="font-size:64px">${d.e}</div><b style="font-size:18px">${d.n}</b><div class="h1" style="color:inherit;margin-top:6px">+${r}</div>${cbadge(c)}</div>
+   <div class="card tint">You guessed <b>+${D.guess}</b>. Real answer <b>+${r}</b>. ${off<=8?'Spot on. You know your body.':r<D.guess?'Your body is kinder than you thought.':'Sneaky. This one climbs more than it looks.'}</div>
+   <div class="pill gold" style="align-self:center">+25 hearts · Dish Dex ${decoded()} of 24</div>
+   <div class="grid2"><button class="btn soft" ${A('detAgain')}>Decode another</button><button class="btn" ${A('detDone')}>See Dish Dex</button></div></div>`}
+  return `${head('Sugar Detective')}<div class="scroll"><div class="stack s20">${ticks}${body}</div></div>`;
+};
+ACT.detDish=(id)=>{S.detective.dish=id;render()};
+ACT.detNext=()=>{const D=S.detective;D.step++;if(D.step===4){D.after=D.before+(TRUTH[D.dish]||40)}chime('pop');render()};
+ACT.detB=(v)=>{S.detective.before=Math.max(60,S.detective.before+ +v);render()};
+ACT.detA=(v)=>{S.detective.after=Math.max(60,S.detective.after+ +v);render()};
+ACT.detSnapMeter=()=>{S.detective.before=96+Math.floor(Math.random()*30);toast('Meter read automatically','camera');render()};
+ACT.detSkip=()=>{S.detective.waiting=true;render();setTimeout(()=>{ACT.detNext()},900)};
+ACT.detReveal=()=>{const D=S.detective,d=dish(D.dish),r=D.after-D.before;d.s=r<=35?'g':r<=60?'y':'r';d.r=r;d.tip=d.tip||'Decoded by you, on '+new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'})+'.';S.dexNew=d.id;D.step=5;D.waiting=false;chime('win');confetti(34);render();earn(25,'Two-Prick Check')};
+ACT.detAgain=()=>{const u=DISHES.find(x=>!x.s);S.detective={step:0,before:108,guess:50,after:null,dish:u?u.id:'upma'};render()};
+ACT.detDone=()=>{S.stack=[];S.tab='plate';S.plateTab='dex';render()};
+ACT.openDetective=()=>{S.detective={step:0,before:108,guess:50,after:null,dish:(DISHES.find(x=>!x.s)||{}).id||'upma'};open('detective')};
+
+/* ----- My Plate ----- */
+function plateMy(){
+  const rows=[['7:00','Filter coffee','1 tumbler, no added sugar','With the morning tablet','g'],['8:30','Idli, sambar, chutney','3 idli instead of 4, extra sambar','Sambar first','y'],['1:00','Rice, sambar, rasam, poriyal, curd','Poriyal and kootu first, 1 cup rice, curd last','Vegetables, dal, then rice','r'],['4:30','Tea and murukku','Tea with a small bowl of sundal','Sundal instead of murukku','g'],['8:00','Chapati and kurma','2 chapati with vegetable kurma','Kurma first','y']];
+  return `<div class="card tint row">${avatar('meera',46)}<div class="grow"><b>Approved by Meera, dietitian</b><div class="muted">Built only from dishes your kitchen already cooks</div></div>${ico('shield',24)}</div>
+  <div class="stack s8">${rows.map(r=>`<div class="card" style="padding:12px 14px"><div class="row between"><b>${r[0]} · ${r[1]}</b>${cbadge(r[4])}</div><div style="margin-top:4px">${r[2]}</div><div class="tiny" style="margin-top:2px">Order: ${r[3]}</div></div>`).join('')}
+   <div class="card row" style="padding:12px 14px">${ico('walk',24)}<div class="grow"><b>8:30 · 10-minute walk</b><div class="tiny">Straight after dinner, with Lakshmi amma</div></div><button class="btn sm" ${A('open','walk')}>Walk</button></div></div>
+  <button class="card gold row" ${A('open','platego')} style="text-align:left;width:100%"><div style="font-size:36px">🍽</div><div class="grow"><div class="h3">Plate Order game</div><div class="muted">Order today's lunch and watch your sugar wave change.</div></div>${ico('chevR')}</button>
+  <div class="sec"><div class="h2">Kitchen Card</div></div>
+  <div class="paper"><div class="tiny">For Lakshmi amma</div><div class="hand" style="font-size:24px;line-height:1.25;margin:6px 0">Serve his kootu first.<br>One cup of rice for him at lunch.</div><div class="tiny">Nothing else changes in your kitchen. Thank you.</div></div>
+  <div class="grid2"><button class="btn soft" ${A('open','kitchen')}>Show Lakshmi</button><button class="btn soft" ${A('tellLakshmi')}>${ico('share')} Send</button></div>
+  <button class="card row" ${A('open','doctor')} style="text-align:left;width:100%">${ico('file',26)}<div class="grow"><b>Doctor Page</b><div class="muted">One page for your visit on 18 Oct</div></div>${ico('chevR')}</button>`;
+}
+SCREENS.kitchen=()=>`${head('Kitchen Card')}<div class="scroll"><div class="paper" style="margin-top:20px;padding:30px 24px"><div class="tiny">For Lakshmi amma</div><div class="hand" style="font-size:38px;line-height:1.2;margin:14px 0;color:var(--g700)">Serve his kootu first.</div><div class="hand" style="font-size:38px;line-height:1.2;color:var(--g700)">One cup of rice for him at lunch.</div><div class="muted" style="margin-top:20px;font-size:17px">Everything else stays the same. Thank you for cooking for him so well.</div><div class="row" style="margin-top:16px">${avatar('murugan',40)}<span class="hand">Murugan</span></div></div></div>`;
+
+const PLATE_ITEMS=[['poriyal','🥬','Poriyal'],['kootu','🥘','Kootu'],['sambar','🍛','Sambar'],['rice','🍚','Rice, 1 cup'],['curd','🥛','Curd']];
+function wave(peak,col,dash){const y=100-peak*.9;return `<path d="M0 100C50 100 60 ${y} 100 ${y}S170 ${100-peak*.35} 300 92" fill="none" stroke="${col}" stroke-width="4" ${dash?'stroke-dasharray="6 6"':''} stroke-linecap="round"/>`}
+SCREENS.platego=()=>{
+  const P=S.plate,o=P.order,full=o.length===PLATE_ITEMS.length,ri=o.indexOf('rice'),b=Math.min(ri,3),peak=ri<0?76:76-b*11,stars=b>=3?3:b===2?2:1;
+  return `${head('Plate Order game')}<div class="scroll"><div class="stack s20"><p class="muted">Tap the food in the order you'd eat it. Rice stays at 1 cup.</p>
+   <div class="grid3">${PLATE_ITEMS.map(([id,e,n])=>{const k=o.indexOf(id);return `<button class="dish ${k>=0?'sel':''}" ${A('pgTap',id)}>${k>=0?`<span class="cnt">${k+1}</span>`:''}<div class="em">${e}</div><b>${n}</b></button>`}).join('')}</div>
+   ${full?`<div class="card tint center"><div class="row between"><b>Your sugar wave</b><span class="pill ${stars===3?'':'gold'}">+${peak} peak</span></div>
+    <svg viewBox="0 0 300 110" width="100%" style="margin-top:8px"><line x1="0" y1="100" x2="300" y2="100" stroke="#E3EFDD" stroke-width="2"/>${wave(76,'#C9C9C0',1)}${wave(peak,'#5B964A')}</svg><div class="row between tiny"><span>Meal</span><span>1 hour</span><span>2 hours</span></div><div class="tiny" style="margin-top:4px">Grey: rice first (+76). Green: your order.</div>
+    <div style="font-size:34px;margin:8px 0">${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}</div><b>${stars===3?'Perfect order: vegetables, dal, then rice.':stars===2?'Good. One more vegetable before the rice.':'Try vegetables and dal before the rice.'}</b></div>
+    <div class="grid2"><button class="btn soft" ${A('pgReset')}>Try again</button><button class="btn" ${A('pgDone')}>${P.done?'Done':'Claim hearts'}</button></div>`:`<div class="card tint center muted">${o.length} of 5 placed</div>`}
+  </div></div>`};
+ACT.pgTap=(id)=>{const o=S.plate.order;if(!o.includes(id)){o.push(id);chime('pop')}render()};
+ACT.pgReset=()=>{S.plate.order=[];render()};
+ACT.pgDone=()=>{if(!S.plate.done){S.plate.done=true;earn(15,'Plate Order');}S.stack=[];render()};
+
+/* ----- Doctor Page ----- */
+SCREENS.doctor=()=>`${head('Doctor Page')}<div class="scroll"><div class="stack"><p class="muted">Before your visit on <b>18 Oct</b>. Dr. Karthik reads this in 60 seconds.</p>
+ <div class="paper" style="transform:none"><div class="row between"><b class="hand" style="font-size:20px">Murugan S., 58</b><span class="tiny">Day 23 of 90</span></div>
+  <div class="grid3" style="margin:12px 0"><div class="stat"><b>118</b><small>Avg fasting</small></div><div class="stat"><b>91%</b><small>Tablets taken</small></div><div class="stat"><b>+41</b><small>Avg meal rise</small></div></div>
+  <div class="tiny">RED DISHES</div><div style="margin:4px 0 10px">🍚 Rice 2 cups (+74) · 🥨 Murukku (+66)</div>
+  <div class="tiny">MISSED DOSES</div><div style="margin:4px 0 10px">2 night tablets in 3 weeks</div>
+  <div class="tiny">FLAGS</div><div style="margin:4px 0">BP 156/96 and 152/94 at counter checks · No eye exam in 12 months</div></div>
+ <button class="btn block" ${A('toast','Sent to Dr. Karthik (demo)')}>${ico('share')} Send to my doctor</button></div></div>`;
+
+const NODES=[
+{d:0,t:'Home built',s:'Divya set it up in 15 minutes',ic:'home',r:'+50 hearts'},
+{d:3,t:'First Sugar Detective',s:'Idli decoded. Green.',ic:'scan',r:'+25 hearts'},
+{d:7,t:'One week of tablets',s:'Your tablet jar started filling',ic:'pill',r:'Voice from Aadhi'},
+{d:14,t:'First Insight',s:'Your Dish Dex was revealed',ic:'sparkle',r:'Scratch card',act:'goDex'},
+{d:15,t:'Choose your plan',s:'Saathi chosen. Savings Meter started.',ic:'rupee',r:'Member prices',act:'plan'},
+{d:30,t:'Plate check-in',s:'Meera tunes your plate with you',ic:'plate',r:'Scratch card'},
+{d:45,t:'Family Check',s:'A free sugar and BP check for Divya',ic:'users',r:'Family gift'},
+{d:60,t:'Walk champion',s:'The family walks 40 days together',ic:'walk',r:'Grand Banyan boost'},
+{d:75,t:'Doctor Page ready',s:'Your visit summary writes itself',ic:'file',r:'Scratch card'},
+{d:90,t:'Lab Day and Report Card',s:'Home HbA1c test. Proof to share.',ic:'trophy',r:'Banyan in bloom',act:'report'},
+];
+VIEWS.journey=()=>{
+  const lv=levelOf(S.hearts),nx=LEVELS[lv+1],cur=NODES.findIndex(n=>n.d>S.day);
+  return `<div class="topbar"><div class="grow"><div class="hello">Journey</div><div class="sub">90 days from Day 0 to your lab proof</div></div>${heartsPill()}</div>
+  <div class="scroll has-tab" data-k="journey"><div class="stack s20">
+   <div class="card dark" style="overflow:hidden"><div class="row"><div style="background:#fff;border-radius:24px;padding:4px 6px">${banyan(lv,104)}</div><div class="grow"><div class="tiny" style="color:#C9E0BF">Family Banyan</div><div class="h2" style="color:#fff;font-size:24px">${LEVELS[lv].n}</div>${nx?`<div style="font-size:14px;opacity:.9;margin:2px 0 8px">${nx.min-S.hearts} hearts to ${nx.n}</div><div class="bar" style="background:rgba(255,255,255,.25)"><i style="width:${(S.hearts-LEVELS[lv].min)/(nx.min-LEVELS[lv].min)*100}%;background:var(--gold)"></i></div>`:'<div>Fully grown</div>'}</div></div>
+    <div class="row" style="margin-top:14px"><div class="grow"><div class="tiny" style="color:#C9E0BF">Day ${S.day} of 90</div>${bar(S.day/90*100,'gold')}</div></div></div>
+   <div class="grid2"><button class="card gold row" ${A('open','gifts')} style="padding:12px;text-align:left">${ico('gift',28)}<div><b>${S.gifts} gifts</b><div class="tiny" style="color:var(--gold2)">Scratch to open</div></div></button>
+    <button class="card row" ${A('open','savings')} style="padding:12px;text-align:left">${ico('rupee',28)}<div><b>₹${S.saved.toLocaleString('en-IN')}</b><div class="tiny">Saved so far</div></div></button></div>
+   <div><div class="sec"><div class="h2">Your 90-day path</div></div><div style="margin-top:14px">
+   ${NODES.map((n,i)=>{const st=n.d<=S.day?'done':i===cur?'now':'locked',last=i===NODES.length-1;
+    return `<div class="node ${st}"><div class="rail"><div class="bubble">${ico(st==='done'?'check':st==='locked'?'lock':n.ic,22)}</div>${last?'':'<div class="line"></div>'}</div>
+     <div class="nb"><button ${A('node',i)}><div class="card ${st==='now'?'gold':''}" style="padding:12px 14px"><div class="row between"><b>Day ${n.d} · ${n.t}</b></div><div class="muted">${n.s}</div><div class="row" style="margin-top:6px;gap:8px"><span class="pill ${st==='done'?'':'gold'}">${st==='done'?'Done':n.r}</span>${st==='now'?`<span class="tiny">${n.d-S.day} days to go</span>`:''}</div></div></button></div></div>`}).join('')}</div></div>
+  </div></div>`;
+};
+ACT.node=(i)=>{const n=NODES[+i];if(n.act==='goDex')return ACT.goDex();if(n.act==='plan')return sheet('plan');if(n.act==='report'){return ACT.openReport()}
+  sheet('node',+i)};
+SHEETS.node=(i)=>{const n=NODES[i],done=n.d<=S.day;return `<div class="center stack"><div class="qi" style="width:72px;height:72px;border-radius:50%;background:${done?'var(--g500)':'var(--gold-soft)'};color:${done?'#fff':'var(--gold2)'};display:grid;place-items:center;margin:0 auto">${ico(done?'check':n.ic,34)}</div><div class="tiny">Day ${n.d}</div><div class="h2">${n.t}</div><p class="muted">${n.s}</p><div class="pill gold" style="align-self:center">Reward: ${n.r}</div>${done?'':'<p class="tiny">Nothing expires. Reach it at your own pace.</p>'}<button class="btn block" ${A('closeSheet')}>Okay</button></div>`};
+
+/* ----- Gifts / scratch card ----- */
+const REWARDS=[{k:'perk',e:'🎟',t:'Free BP check and ₹50 off',d:'On your next lab test at a Pulse point',save:50},{k:'voice',e:'🎙',t:'A voice from Aadhi',d:'“Thatha, you are my hero!”',voice:1},{k:'tip',e:'🥜',t:'Kitchen tip',d:'Add a handful of sprouts to your sundal for crunch and fibre.'},{k:'perk',e:'💊',t:'₹100 off your next refill',d:'Added to your Savings Meter',save:100}];
+SCREENS.gifts=()=>{
+  const i=S.giftLog.length%REWARDS.length,r=REWARDS[i];
+  if(S.gifts<=0&&!S.scratchDone)return `${head('My gifts')}<div class="scroll"><div class="center stack" style="padding-top:60px"><div style="font-size:64px">🎁</div><div class="h2">No gifts waiting</div><p class="muted">Finish today's kolam or reach a Journey milestone and a scratch card appears. They never expire.</p><button class="btn" ${A('back')}>Back</button></div></div>`;
+  return `${head('Scratch card')}<div class="scroll"><div class="stack s20"><p class="muted">A surprise from your family and your care team. No catch, no countdown.</p>
+   <div class="scratch" id="scratchbox"><div class="under"><div><div style="font-size:48px">${r.e}</div><div class="h3">${r.t}</div><div class="muted">${r.d}</div></div></div>${S.scratchDone?'':'<canvas id="sc" aria-label="Scratch to reveal"></canvas>'}</div>
+   ${S.scratchDone?`<div class="stack s10">${r.voice?`<button class="btn soft block" ${A('giftVoice')}>${ico('volume')} Play it</button>`:''}${S.gifts>0?`<button class="btn block" ${A('nextGift')}>Next gift (${S.gifts} left)</button>`:`<button class="btn block" ${A('back')}>Done</button>`}</div>`:`<div class="center tiny">${S.gifts} scratch ${S.gifts===1?'card':'cards'} waiting · Scratch with your finger</div>`}</div></div>`;
+};
+document.addEventListener('rendered',()=>{
+  const cv=$('#sc');if(!cv||cv._init)return;cv._init=1;const b=$('#scratchbox').getBoundingClientRect(),dpr=window.devicePixelRatio||1;cv.width=b.width*dpr;cv.height=b.height*dpr;
+  const c=cv.getContext('2d',{willReadFrequently:true});c.scale(dpr,dpr);const g=c.createLinearGradient(0,0,b.width,b.height);g.addColorStop(0,'#7DB06C');g.addColorStop(.5,'#A8CF9A');g.addColorStop(1,'#4B7A3C');c.fillStyle=g;c.fillRect(0,0,b.width,b.height);
+  c.fillStyle='rgba(255,255,255,.25)';for(let x=0;x<b.width;x+=22)for(let y=0;y<b.height;y+=22){c.beginPath();c.arc(x+(y/22%2)*11,y,2.5,0,7);c.fill()}
+  c.fillStyle='#fff';c.font='800 24px "Baloo 2", sans-serif';c.textAlign='center';c.fillText('Scratch here',b.width/2,b.height/2+6);
+  let down=false,n=0;const sc=(e)=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left),(e.clientY-r.top)]};
+  const dot=(e)=>{const [x,y]=sc(e);c.globalCompositeOperation='destination-out';c.beginPath();c.arc(x,y,24,0,7);c.fill();if(++n%5===0)check()};
+  const check=()=>{const d=c.getImageData(0,0,cv.width,cv.height).data;let t=0,k=0;for(let i=3;i<d.length;i+=4*40){k++;if(d[i]<20)t++}if(t/k>.45)finish()};
+  const finish=()=>{if(S.scratchDone)return;S.scratchDone=true;const r=REWARDS[S.giftLog.length%REWARDS.length];if(r.save){S.saved+=r.save}confetti(46);chime('win');hearts(5);earn(10,'Gift opened');render()};
+  cv.addEventListener('pointerdown',e=>{down=true;cv.setPointerCapture(e.pointerId);dot(e)});cv.addEventListener('pointermove',e=>{if(down)dot(e)});cv.addEventListener('pointerup',()=>{down=false;check()});
+});
+ACT.nextGift=()=>{S.giftLog.push(0);S.gifts--;S.scratchDone=false;render()};
+ACT.giftVoice=()=>playVoice(4);
+const _bk=ACT.back;ACT.back=()=>{if(S.stack.length&&S.stack[S.stack.length-1].name==='gifts'&&S.scratchDone){S.giftLog.push(0);S.gifts=Math.max(0,S.gifts-1);S.scratchDone=false}_bk()};
+
+/* ----- Plan & savings ----- */
+const SAVINGS=[['Medicines at member price','15% off ₹9,600',1440],['Two free home HbA1c tests','Worth ₹299 each',598],['Member price on other lab tests','20% off ₹1,500',300],['Two specialist consults','₹150 off each',300]];
+SHEETS.plan=()=>`<div class="stack"><div class="center"><div class="tiny">Day 15 choice, any time after</div><div class="h2">Your family's plan</div><p class="muted">Free stays free. Pick Saathi only if the numbers make sense for your home.</p></div>
+ ${[['free','Pulse Free','₹0','Family home, Medicine Buddy, voices, Say It, Snap Plate, 14 days of Two-Prick Check, Safety Net'],['saathi','Saathi Annual','₹1,999 a year','Just ₹5.50 a day for the whole household. Adds My Plate, care team, Doctor Page, 2 free HbA1c tests, member prices'],['monthly','Saathi Monthly','₹249 a month','Same as Annual, paid by UPI Autopay']].map(([k,t,p,d])=>`<button class="card ${S.plan===k?'tint':''}" ${A('setPlan',k)} style="text-align:left;width:100%;border-color:${S.plan===k?'var(--g500)':'var(--line)'};border-width:2px"><div class="row between"><b>${t}</b><b style="color:var(--g700)">${p}</b></div><div class="muted">${d}</div>${S.plan===k?`<div class="pill" style="margin-top:8px">${ico('check',14)} Your plan</div>`:''}</button>`).join('')}
+ <div class="card gold"><div class="row between"><b>Savings Meter</b><b>₹${S.saved.toLocaleString('en-IN')} of ₹1,999</b></div>${bar(S.saved/1999*100,'gold')}<div class="tiny" style="margin-top:6px">At this pace the plan pays for itself by Month 7. A full year of member prices is about ₹2,638.</div></div>
+ <button class="btn block ghost" ${A('open','savings')}>See where the savings come from</button></div>`;
+ACT.plan=()=>sheet('plan');
+ACT.setPlan=(k)=>{S.plan=k;render();toast(k==='free'?'Staying free. Everything essential stays.':'Plan updated. No hidden charges.','check')};
+SCREENS.savings=()=>{const tot=SAVINGS.reduce((a,b)=>a+b[2],0);return `${head('Savings Meter')}<div class="scroll"><div class="stack">
+ <div class="card dark center"><div class="tiny" style="color:#C9E0BF">Saved this year at Day ${S.day}</div><div class="big-num" style="color:#fff">₹${S.saved.toLocaleString('en-IN')}</div>${bar(S.saved/1999*100,'gold')}<div style="margin-top:8px;font-size:14px">${Math.max(0,1999-S.saved).toLocaleString('en-IN')} more and the plan has paid for itself</div></div>
+ <div class="card stack s8">${SAVINGS.map(([t,s,v])=>`<div class="row"><div class="grow"><b>${t}</b><div class="tiny">${s}</div></div><b style="color:var(--g700)">+₹${v.toLocaleString('en-IN')}</b></div>`).join('')}<div class="divider"></div><div class="row"><b class="grow">Full-year member savings</b><b>₹${tot.toLocaleString('en-IN')}</b></div><div class="row"><span class="grow muted">Saathi Annual</span><span>−₹1,999</span></div><div class="row"><b class="grow" style="color:var(--g700)">Net for your family</b><b style="color:var(--g700)">+₹639</b></div></div>
+ <p class="tiny center">Online pharmacies may discount more. Pulse wins on same-day delivery, a free monthly check and a chemist you know.</p></div></div>`};
+
+/* ----- Report card ----- */
+ACT.openReport=()=>{open('report');setTimeout(()=>{confetti(60);chime('win')},500)};
+SCREENS.report=()=>`${head('90-Day Report Card',{right:`<span class="pill gold">${ico('trophy',14)} Proof</span>`})}<div class="scroll"><div class="stack s20">
+ <div class="card dark center" style="padding:22px 16px"><div class="tiny" style="color:#C9E0BF">${S.name} · Day 0 to Day 90</div><div class="h2" style="color:#fff;font-size:26px;margin:4px 0 14px">Your sugar came down</div>
+  <div class="row" style="justify-content:center;gap:22px;align-items:flex-end"><div><div style="width:70px;height:120px;border-radius:14px 14px 0 0;background:rgba(255,255,255,.35);margin:0 auto"></div><div class="big-num" style="color:#fff;font-size:34px">8.4%</div><div class="tiny" style="color:#C9E0BF">Day 0</div></div>
+  <div style="padding-bottom:50px">${ico('chevR',34)}</div><div><div style="width:70px;height:${120*7.6/8.4}px;border-radius:14px 14px 0 0;background:var(--gold);margin:0 auto;animation:grow 1.2s"></div><div class="big-num" style="color:#fff;font-size:34px">7.6%</div><div class="tiny" style="color:#C9E0BF">Day 90</div></div></div>
+  <style>@keyframes grow{from{height:0}}</style>
+  <div class="pill gold" style="margin-top:14px">${ico('check',14)} Down 0.8 points. Target was 0.5</div></div>
+ <div class="grid2"><div class="stat"><b>91%</b><small>Tablets taken</small></div><div class="stat"><b>76%</b><small>Plate rules kept</small></div><div class="stat"><b>61</b><small>Walk days</small></div><div class="stat"><b>18/24</b><small>Dishes decoded</small></div></div>
+ <div class="card tint row">${avatar('aadhi',50)}<div class="grow"><b>“Thatha, super!”</b><div class="tiny">Aadhi's Day 90 clip</div></div><button class="iconbtn" ${A('giftVoice')} aria-label="Play">${ico('play')}</button></div>
+ <div class="card"><div class="row between"><b>Savings Meter</b><b style="color:var(--g700)">₹2,638 this year</b></div>${bar(100,'gold')}<div class="tiny" style="margin-top:6px">More than the ₹1,999 plan. It paid for itself.</div></div>
+ <div class="stack s10"><button class="btn block" ${A('toast','Sent to the family group (demo)')}>${ico('share')} Send to family group</button><button class="btn block soft" ${A('open','doctor')}>Show my Doctor Page</button><button class="btn block gold" ${A('sheet','plan')}>Renew Saathi for another year</button></div></div></div>`;
+
+/* ----- Settings / Me ----- */
+SHEETS.me=()=>`<div class="stack"><div class="row">${avatar('murugan',60)}<div class="grow"><div class="h2">${S.name}</div><div class="muted">Coimbatore · ${S.plan==='free'?'Pulse Free':'Saathi'}</div></div></div>
+ <div><span class="lbl">How the app looks</span><div class="seg">${[['easy','Easy'],['standard','Standard'],['busy','Busy']].map(([k,l])=>`<button class="${S.mode===k?'on':''}" ${A('setMode',k)}>${l}</button>`).join('')}</div><div class="tiny" style="margin-top:6px">${{easy:'Three big buttons, voice first.',standard:'Family home screen and your daily kolam.',busy:'Quiet, quick, family features off.'}[S.mode]}</div></div>
+ <div><span class="lbl">Nudge style</span><div class="seg">${[['playful','Playful'],['gentle','Gentle'],['quiet','Quiet']].map(([k,l])=>`<button class="${S.nudgeStyle===k?'on':''}" ${A('nstyle',k)}>${l}</button>`).join('')}</div></div>
+ <div class="item"><div class="grow"><b>Quiet hours</b><div class="tiny">No nudges at night, except safety and medicines</div></div>${toggle(S.quiet,'quietTog')}</div>
+ <div class="item"><div class="grow"><b>Sounds</b><div class="tiny">Chimes and family voices</div></div>${toggle(S.sound,'toggleSound')}</div>
+ <div class="item"><div class="grow"><b>Language</b><div class="tiny">English. More languages coming soon.</div></div><span class="pill line">English</span></div>
+ <button class="item" ${A('open','consent')} style="width:100%;text-align:left"><div class="grow"><b>Privacy and consent</b><div class="tiny">You decide who sees what</div></div>${ico('chevR')}</button>
+ <button class="item" ${A('sheet','plan')} style="width:100%;text-align:left"><div class="grow"><b>Plan and savings</b><div class="tiny">${S.plan==='free'?'Pulse Free':'Saathi'} · ₹${S.saved.toLocaleString('en-IN')} saved</div></div>${ico('chevR')}</button>
+ <button class="item" ${A('open','photoSet')} style="width:100%;text-align:left"><div class="grow"><b>Home screen photo</b><div class="tiny">Change the family photo</div></div>${ico('chevR')}</button>
+ <button class="btn block ghost" ${A('switchRole')}>Switch person (demo)</button></div>`;
+ACT.nstyle=(k)=>{S.nudgeStyle=k;render();toast(k==='quiet'?'Only medicines and safety from now':'Nudge style updated','bell')};
+ACT.quietTog=()=>{S.quiet=!S.quiet;render()};
+ACT.switchRole=()=>{S.role=null;S.stack=[];S.sheet=null;render()};
+SCREENS.photoSet=()=>`${head('Home screen photo')}<div class="scroll"><div class="stack"><p class="muted">The first thing you see each day. Choose the backdrop or upload a real family photo.</p>
+ <div class="grid3">${[0,1,2].map(v=>`<button class="card" ${A('photoV',v)} style="padding:6px;border-color:${S.photoV===v&&!S.userPhoto?'var(--g500)':'var(--line)'};border-width:2px"><svg viewBox="40 40 250 250" width="100%">${familyPhoto(v).replace(/x="40" y="40" width="250" height="250"/,'')}</svg></button>`).join('')}</div>
+ <label class="btn soft block" for="photofile" style="cursor:pointer">${ico('camera')} Upload your own photo</label><input id="photofile" type="file" accept="image/*" style="position:absolute;opacity:0;width:1px;height:1px">
+ ${S.userPhoto?`<button class="btn block ghost" ${A('rmPhoto')}>Use the illustration again</button>`:''}</div></div>`;
+ACT.photoV=(v)=>{S.photoV=+v;S.userPhoto=null;render()};
+ACT.rmPhoto=()=>{S.userPhoto=null;render()};
+SCREENS.consent=()=>{const c=S.setup.consent;return `${head('Privacy and consent')}<div class="scroll"><div class="stack"><p class="muted">Each kind of information has its own switch. Say no to any, any time.</p>
+ <div class="card">${[['readings','Readings and meals','Care team and your Doctor Page'],['meds','Medicine list','Your Pulse point chemist sees refills only'],['postcard','Weekly Postcard','Divya and Lakshmi, only after you approve']].map(([k,t,d])=>`<div class="item"><div class="grow"><b>${t}</b><div class="tiny">${d}</div></div>${toggle(c[k],'consentTog',k)}</div>`).join('')}
+ <div class="item"><div class="grow"><b>Mood and sleep</b><div class="tiny">Never shared with family. Not by any setting.</div></div><span class="pill">${ico('lock',14)} Private</span></div></div>
+ <button class="btn block ghost" ${A('toast','Link to your national health ID needs your OTP (demo)')}>Link my health ID</button>
+ <button class="btn block ghost" ${A('toast','Delete request sent (demo)')} style="color:var(--coral);border-color:#F3B9AD">Delete my data</button></div></div>`};
+ACT.consentTog=(k)=>{S.setup.consent[k]=!S.setup.consent[k];render()};
+
+const SHIELD=[
+ {id:'eyes',l:'Eyes',ic:'eye',x:64,y:98,d:'Retinal photo at the hospital spoke, once a year.',b:'One-trip booking: eyes, feet and a urine test on the same visit.'},
+ {id:'kidney',l:'Kidneys',ic:'drop',x:130,y:98,d:'Urine albumin and eGFR in your yearly lab panel.',b:'Added to your next home blood draw.'},
+ {id:'feet',l:'Feet',ic:'foot',x:196,y:98,d:'Sensation test once a year, and a monthly photo check at home.',b:'Foot clinic within days if a sore does not heal.'},
+ {id:'bp',l:'BP',n:'Blood pressure',ic:'activity',x:64,y:180,d:'Counter Check at your Pulse point flagged 156/96 and 152/94.',b:'A care team call, then a doctor visit at the spoke.'},
+ {id:'fats',l:'Blood fats',ic:'flask',x:130,y:180,d:'Lipid panel with your yearly blood test.',b:'Done at Day 90. In range.'},
+ {id:'mood',l:'Mood',ic:'smile',x:196,y:180,d:'A private two-question check every month. Only you and the care team see it.',b:'Takes one minute.'},
+];
+VIEWS.care=()=>{
+  const done=Object.values(S.shield).filter(x=>x==='done').length;
+  return `<div class="topbar"><div class="grow"><div class="hello">Care</div><div class="sub">Sugar never comes alone. Neither will you.</div></div>${heartsPill()}</div>
+  <div class="scroll has-tab" data-k="care"><div class="stack s20">
+  ${S.carePrompt==='open'?careprompt():S.carePrompt==='booked'?`<div class="card tint row">${ico('check',26)}<div class="grow"><b>BP visit booked</b><div class="muted">Sat, 24 Oct · 10:30 am · Dr. Karthik at the spoke</div></div></div>`:''}
+  <div class="card"><div class="row between"><div><div class="h2">Yearly Shield</div><div class="muted">${done} of 6 pieces complete</div></div><span class="pill gold">${ico('shield',14)} ${done>=6?'Full shield':'Building'}</span></div>
+   <svg viewBox="0 0 260 268" style="width:100%;max-width:330px;margin:6px auto 0"><path d="M130 8L246 42V128C246 196 196 244 130 262C64 244 14 196 14 128V42Z" fill="#F3F8F0" stroke="#C9E0BF" stroke-width="4"/>
+    ${SHIELD.map(p=>{const st=S.shield[p.id],col=st==='done'?'#5B964A':st==='flag'?'#E0614A':'#fff',fg=st==='done'||st==='flag'?'#fff':'#C98A00';return `<g class="petal" data-act="shield" data-arg="${p.id}" tabindex="0" role="button" aria-label="${p.l}: ${st==='done'?'done':st==='flag'?'worth checking':'due'}" style="cursor:pointer"><circle cx="${p.x}" cy="${p.y}" r="26" fill="${col}" stroke="${st==='due'?'#F0AE1B':col}" stroke-width="3.5" ${st==='due'?'stroke-dasharray="6 5"':''}/><g style="color:${fg}">${icoG(st==='done'?'check':p.ic,p.x,p.y,24)}</g><text x="${p.x}" y="${p.y+43}" text-anchor="middle" font-size="12.5" font-weight="800" fill="#52604C" font-family="Nunito,sans-serif">${p.l}</text></g>`}).join('')}</svg>
+   <div class="tiny center">Pulse says "worth checking". Only your doctor says what it means.</div></div>
+  <div class="stack s8"><div class="sec"><div class="h2">Near you</div></div>
+   <div class="card"><div class="row"><div class="qi" style="width:46px;height:46px;border-radius:14px;background:var(--g100);color:var(--g700);display:grid;place-items:center">${ico('store',24)}</div><div class="grow"><b>Sri Murugan Medicals</b><div class="tiny">Your Pulse point · 350 m · open till 9:30 pm</div></div><button class="btn sm soft" ${A('open','locator')}>Map</button></div>
+   <div class="divider" style="margin:12px 0"></div><div class="row between"><b>Free monthly Counter Check</b><span class="tiny">${S.stamps} of 12 stamps</span></div>
+   <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:10px">${Array.from({length:12},(_,i)=>`<div class="stamp ${i<S.stamps?'on':''}" style="font-size:13px">${i<S.stamps?ico('check',16):i+1}</div>`).join('')}</div>
+   <div class="tiny" style="margin-top:8px">Stamp 12 unlocks a free Family Check for Divya.</div></div></div>
+  <div class="stack s8"><div class="sec"><div class="h2">Book</div></div>
+   <div class="grid2"><button class="card" ${A('sheet','lab')} style="text-align:left;padding:14px">${ico('flask',28)}<b style="display:block;margin-top:6px">Lab at home</b><div class="tiny">${S.labFree} free HbA1c left</div></button>
+    <button class="card" ${A('open','specialist')} style="text-align:left;padding:14px">${ico('user',28)}<b style="display:block;margin-top:6px">Specialist</b><div class="tiny">Video consult, member price</div></button></div></div>
+  <button class="card row" ${A('open','chat')} style="text-align:left;width:100%">${avatar('priya',46)}<div class="grow"><b>Care team</b><div class="muted">Priya and Meera reply with voice notes</div></div>${ico('chevR')}</button>
+  <button class="card tint row" ${A('open','mood')} style="text-align:left;width:100%">${ico('lock',26)}<div class="grow"><b>Mood check</b><div class="muted">Private. Never shared with family.</div></div>${ico('chevR')}</button>
+  <button class="btn block ghost" ${A('open','safety')} style="color:var(--coral);border-color:#F3B9AD">${ico('activity')} Feeling unwell or low? Safety Net</button>
+  </div></div>`;
+};
+function careprompt(){
+  return `<div class="card shadow" style="border:2px solid var(--g200)"><div class="row">${avatar('priya',50)}<div class="grow"><div class="tiny">A voice note from your care team</div><b>Priya</b></div><span class="pill">0:18</span></div>
+  <div class="row" style="margin:12px 0;background:var(--g50);border-radius:99px;padding:6px 12px 6px 6px"><button class="iconbtn" style="background:var(--g500);color:#fff" ${A('toast','Playing Priya\'s voice note (demo)')} aria-label="Play">${ico('play')}</button><div class="wave off" style="margin:0;flex:1;height:30px">${'<i></i>'.repeat(22)}</div></div>
+  <p style="font-size:16px">“Hello, Murugan sir. Your blood pressure at Sri Murugan Medicals was 156/96, and 152/94 a week later. Would it be alright if I book a short visit with Dr. Karthik?”</p>
+  <div class="grid2" style="margin-top:12px"><button class="btn" ${A('cpYes')}>Yes, please</button><button class="btn ghost" ${A('cpNo')}>Not now</button></div>
+  <button class="link" ${A('why')} style="margin-top:10px">Why am I seeing this?</button>
+  ${S.why?`<div class="stack s8" style="margin-top:10px;font-size:14px"><div class="row">${ico('check',18)}<span class="grow"><b>Clinically due.</b> Two readings a week apart at or above 140/90.</span></div><div class="row">${ico('check',18)}<span class="grow"><b>You allowed it.</b> You shared counter checks with your care team.</span></div><div class="row">${ico('check',18)}<span class="grow"><b>Fair price.</b> ₹400 at the spoke against ₹550 outside.</span></div><div class="tiny">A government hospital OPD also checks BP for free. You choose.</div></div>`:''}</div>`;
+}
+ACT.why=()=>{S.why=!S.why;render()};
+ACT.cpYes=()=>{S.carePrompt='booked';S.shield.bp='due';render();earn(10,'Looking after yourself');toast('Booked. Priya will call to confirm.','check')};
+ACT.cpNo=()=>{S.notNow++;if(S.notNow>=2){S.carePrompt='dropped';toast("Okay. We won't ask about this again.",'check')}else{S.carePrompt='later';toast('No problem. We will ask once more next month.','check')}render()};
+ACT.shield=(id)=>sheet('shield',id);
+SHEETS.shield=(id)=>{const p=SHIELD.find(x=>x.id===id),st=S.shield[id];
+  return `<div class="center stack"><div class="qi" style="width:72px;height:72px;border-radius:50%;background:${st==='done'?'var(--g500)':st==='flag'?'var(--coral)':'var(--gold-soft)'};color:${st==='due'?'var(--gold2)':'#fff'};display:grid;place-items:center;margin:0 auto">${ico(p.ic,34)}</div><div class="h2">${p.n||p.l}</div>${cbadgeShield(st)}<p class="muted">${p.d}</p><div class="card tint" style="text-align:left">${p.b}</div>
+  ${st==='done'?`<button class="btn block" ${A('closeSheet')}>Lovely</button>`:id==='mood'?`<button class="btn block" ${A('moodGo')}>Start the private check</button>`:`<button class="btn block" ${A('shieldBook',id)}>Book it${id==='eyes'?' (Sat 24 Oct, 10:30)':''}</button><button class="btn block ghost" ${A('closeSheet')}>Not now</button>`}</div>`};
+const cbadgeShield=(st)=>st==='done'?'<span class="pill" style="align-self:center">Complete</span>':st==='flag'?'<span class="pill coral" style="align-self:center">Worth checking</span>':'<span class="pill gold" style="align-self:center">Due</span>';
+ACT.shieldBook=(id)=>{S.sheet=null;S.shield[id]='done';render();earn(20,'Shield piece');confetti(24);toast('Booked at the hospital spoke','calendar')};
+ACT.moodGo=()=>{S.sheet=null;open('mood')};
+
+/* ----- Lab at home ----- */
+SHEETS.lab=()=>`<div class="stack"><div class="h2">Lab at home</div><p class="muted">A trained collector comes to your door. Results flow into your Doctor Page.</p>
+ <div class="card tint row">${ico('flask',26)}<div class="grow"><b>HbA1c test</b><div class="tiny">${S.labFree} free test left this year</div></div><span class="pill">₹0</span></div>
+ <div><span class="lbl">Pick a morning</span><div class="chips">${['Sat 10 Oct, 7 am','Sun 11 Oct, 7 am','Mon 12 Oct, 7 am'].map((s,i)=>`<button class="chip ${S.labSlot===i?'on':''}" ${A('labSlot',i)}>${s}</button>`).join('')}</div></div>
+ <button class="btn gold block" ${A('toast','Tell Pulse your slot by voice (demo)')}>${ico('mic')} Book by voice instead</button>
+ <button class="btn block" ${A('labBook')} ${S.labSlot===undefined?'disabled':''}>Confirm booking</button></div>`;
+ACT.labSlot=(i)=>{S.labSlot=+i;render()};
+ACT.labBook=()=>{S.sheet=null;S.labFree=Math.max(0,S.labFree-1);render();toast('Lab visit booked','check');earn(10,'Lab booked')};
+
+/* ----- Specialist, locator, chat, mood, safety ----- */
+SCREENS.specialist=()=>`${head('Specialist Connect')}<div class="scroll"><div class="stack"><p class="muted">Video consults with urban specialists from your partner hospital chain. Your records are shared only if you say yes.</p>
+ ${[['anitha','Dr. Anitha Rao','Endocrinologist · 14 years','Today 6:30 pm','₹650'],['karthik','Dr. Karthik','Diabetologist · 11 years','Tomorrow 11 am','₹650']].map(([k,n,r,s,p])=>`<div class="card"><div class="row">${avatar(k,56)}<div class="grow"><b>${n}</b><div class="muted">${r}</div></div></div><div class="row between" style="margin-top:12px"><div><div class="tiny">Next slot</div><b>${s}</b></div><div style="text-align:right"><b style="color:var(--g700)">${p}</b><div class="tiny" style="text-decoration:line-through">₹800</div></div></div><button class="btn block" style="margin-top:12px" ${A('toast','Video consult booked (demo)')}>Book video consult</button></div>`).join('')}
+ <div class="tip">${ico('info',18)}<span>Member price is ₹150 off the usual fee. Pulse never gets paid for what a doctor advises.</span></div></div></div>`;
+SCREENS.locator=()=>`${head('Pulse points near you')}<div class="scroll"><div class="stack"><div class="card" style="padding:0;overflow:hidden"><svg viewBox="0 0 340 190" width="100%"><rect width="340" height="190" fill="#EEF5EA"/><path d="M0 120C80 100 140 150 340 90M120 0C130 70 100 130 150 190M230 0C220 60 260 110 250 190" stroke="#fff" stroke-width="12" fill="none"/><path d="M0 60C100 70 200 40 340 70" stroke="#fff" stroke-width="7" fill="none"/>
+ <circle cx="170" cy="100" r="9" fill="#4C8FB5" stroke="#fff" stroke-width="3"/><g fill="#5B964A" stroke="#fff" stroke-width="3"><path d="M200 70a12 12 0 1 1 .1 0l-6 18z" transform="translate(-6,-18)"/><path d="M95 120a12 12 0 1 1 .1 0l-6 18z" transform="translate(-6,-18)"/><path d="M265 140a12 12 0 1 1 .1 0l-6 18z" transform="translate(-6,-18)"/></g></svg></div>
+ ${[['Sri Murugan Medicals','350 m','Open till 9:30 pm','₹680',true],['Kovai Health Pharmacy','900 m','Open till 10 pm','₹684'],['Annapoorna Medicals','1.4 km','Open till 9 pm','₹680']].map(([n,d,h,p,f])=>`<div class="card row">${ico('store',26)}<div class="grow"><b>${n}</b> ${f?'<span class="pill">Your point</span>':''}<div class="tiny">${d} · ${h}</div></div><div style="text-align:right"><b style="color:var(--g700)">${p}</b><div class="tiny">for your monthly refill</div></div></div>`).join('')}
+ <div class="tip">${ico('info',18)}<span>You can always use any pharmacy. Pulse shows the nearest first and never hides the rest.</span></div></div></div>`;
+SCREENS.chat=()=>`${head('Care team')}<div class="scroll"><div class="stack"><div class="center tiny">Voice notes. Replies within a few hours.</div>
+ <div class="row top">${avatar('priya',38)}<div class="bubbleMsg"><div class="row" style="gap:8px">${ico('play',18)}<div class="wave off" style="margin:0;height:24px;width:120px">${'<i></i>'.repeat(14)}</div><span class="tiny">0:12</span></div><div class="tiny" style="margin-top:4px">Good morning. How were the idli this week?</div></div></div>
+ <div class="bubbleMsg me"><div class="row" style="gap:8px">${ico('play',18)}<span>“Three idli, no problem. Rice was a worry.”</span></div></div>
+ <div class="row top">${avatar('meera',38)}<div class="bubbleMsg">Rice at 1 cup works for you. Keep the vegetables first.</div></div>
+ <div class="tip" style="padding:0 6px">${ico('info',18)}<span>Care team can't change a dose. Only your doctor can.</span></div></div></div>
+ <div class="ovfoot"><div class="row" style="justify-content:center"><div class="micwrap" style="width:90px;height:90px" data-hold="chat"><button class="mic" style="width:70px;height:70px;box-shadow:0 5px 0 #2b4621" aria-label="Hold to record">${ico('mic')}</button></div></div><div class="center tiny">Hold to record a voice note</div></div>`;
+HOLD.chat={down(){},up(){toast('Voice note sent to Priya (demo)','mic')}};
+
+const MQ=['Over the last 2 weeks, how often have you had little interest or pleasure in doing things?','Over the last 2 weeks, how often have you felt down or low?'];
+SCREENS.mood=()=>{const q=S.moodQ;
+ if(q>=2){const hi=S.moodA.reduce((a,b)=>a+b,0)>=3;return `${head('Mood check')}<div class="scroll"><div class="center stack" style="padding-top:30px"><div class="qi" style="width:80px;height:80px;border-radius:50%;background:var(--g100);color:var(--g700);display:grid;place-items:center;margin:0 auto">${ico('heart',38)}</div><div class="h2">Thank you for telling us</div>
+  ${hi?`<p class="muted">Many people with diabetes feel low at times. It is common and it can be helped. Would you like a private chat with a counsellor?</p><button class="btn block" ${A('counsel')}>Yes, set up a private chat</button><div class="calm">Need to talk now? Tele-MANAS 14416 is free, 24 hours.</div>`:`<p class="muted">That sounds steady. We'll ask again next month.</p>`}
+  <button class="btn block ghost" ${A('moodDone')}>Done</button><div class="tiny">${ico('lock',12)} Only you and the care team see this. Never family.</div></div></div>`}
+ return `${head('Mood check')}<div class="scroll"><div class="stack s20"><div class="calm row">${ico('lock',18)}<span>Private. No hearts, no points, no family.</span></div><div class="tiny">Question ${q+1} of 2</div><div class="h2">${MQ[q]}</div>
+  <div class="stack s10">${['Not at all','Several days','More than half the days','Nearly every day'].map((t,i)=>`<button class="card" ${A('moodA',i)} style="text-align:left;font-weight:800;font-size:17px;padding:16px">${t}</button>`).join('')}</div></div></div>`};
+ACT.moodGo=ACT.moodGo;
+ACT.moodA=(i)=>{S.moodA.push(+i);S.moodQ++;render()};
+ACT.moodDone=()=>{S.moodQ=0;S.moodA=[];S.shield.mood='done';S.stack=[];render();toast('Thank you. Rest well.','heart')};
+ACT.counsel=()=>{toast('A counsellor will message you privately','lock');ACT.moodDone()};
+
+SCREENS.safety=()=>{const low=S.safetyLow!==false;const st=S.safe||{};
+ return `${head('Safety Net')}<div class="scroll"><div class="stack">
+ ${low?`<div class="card" style="background:var(--yellow-soft);border-color:#F4DB8A;text-align:center"><div class="tiny">Your reading just now</div><div class="big-num" style="color:#9a7000">62</div><b>mg/dL is low. You're okay. Let's fix it together.</b></div>`:''}
+ <div class="calm">Calm mode. No hearts or games here. Only help.</div>
+ <div class="h3">Do these in order</div>
+ ${[['Have 15 grams of fast sugar','3 glucose tablets, or half a cup of juice, or 1 tablespoon of sugar in water.'],['Sit down and rest','Don\'t drive or walk alone for now.'],['Check again in 15 minutes','Pulse will remind you.']].map((s,i)=>`<button class="card row top" ${A('safeStep',i)} style="text-align:left;width:100%;${st[i]?'background:var(--g50);border-color:var(--g200)':''}"><span class="qi" style="width:38px;height:38px;border-radius:50%;background:${st[i]?'var(--g500)':'var(--g100)'};color:${st[i]?'#fff':'var(--g700)'};display:grid;place-items:center;flex:none;font-weight:900">${st[i]?ico('check',20):i+1}</span><div><b style="font-size:16.5px">${s[0]}</b><div class="muted">${s[1]}</div></div></button>`).join('')}
+ <div class="card tint stack s8"><div class="row">${ico('call',22)}<span class="grow"><b>Care team will call within the hour</b></span></div><div class="row">${ico('users',22)}<span class="grow"><b>Divya has been told</b> <span class="tiny">(you agreed to this)</span></span></div></div>
+ <div class="grid2"><button class="btn coral" ${A('toast','Calling the care team (demo)')}>${ico('call')} Care team</button><button class="btn coral" ${A('toast','Calling 108 (demo)')}>${ico('call')} Call 108</button></div>
+ <div class="warn">Chest pain, sudden weakness or confusion? Call <b>108</b> or <b>112</b> now. The nearest partner emergency is Kovai Hospital, 3.1 km.</div>
+ <div class="tiny center">Thresholds are set with your clinicians.</div></div></div>`};
+ACT.safeStep=(i)=>{S.safe=S.safe||{};S.safe[i]=!S.safe[i];render()};
+
+VIEWS.family=()=>{
+  const ch=S.challenge;
+  return `<div class="topbar"><div class="grow"><div class="hello">Family</div><div class="sub">Pulse opens to your family, not your numbers</div></div>${heartsPill()}</div>
+  <div class="scroll has-tab" data-k="family"><div class="stack s20">
+   <div class="card"><div class="row" style="justify-content:space-around;text-align:center">${[['murugan','You','Home'],['divya','Divya','Bengaluru'],['lakshmi','Lakshmi','Home'],['aadhi','Aadhi','Home']].map(([k,n,w])=>`<div>${avatar(k,56,k==='divya'?'#C9E0BF':'')}<div style="font-weight:900;margin-top:4px">${n}</div><div class="tiny">${w}</div></div>`).join('')}</div>
+   <div class="row" style="margin-top:14px"><button class="btn soft grow" ${A('familyHeart')}>${ico('heart',20,'fill')} Send a heart</button><button class="btn soft grow" ${A('playvoice')}>${ico('volume')} Hear a voice</button></div></div>
+   <div class="card gold"><div class="row between"><div><div class="tiny" style="color:var(--gold2)">FAMILY QUEST · THIS WEEK</div><div class="h2">Five evening walks together</div></div><span class="pill gold">${ch}/5</span></div>
+    <div class="row" style="margin:14px 0;justify-content:space-between">${[1,2,3,4,5].map(i=>`<div style="width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:${i<=ch?'var(--g500)':'#fff'};color:${i<=ch?'#fff':'var(--ink3)'};border:2.5px ${i<=ch?'solid var(--g500)':'dashed #E3C777'}">${i<=ch?ico('check',22):i}</div>`).join('')}</div>
+    <div class="muted">Divya counts too. She walks in Bengaluru and it adds to Appa's total. Everyone wins together, nobody loses.</div>
+    <div class="row" style="margin-top:12px"><span class="av-stack">${['murugan','lakshmi','divya','aadhi'].map(k=>avatar(k,34)).join('')}</span><button class="btn sm gold grow" ${A('open','walk')}>Walk tonight</button></div></div>
+   <div><div class="sec"><div class="h2">Sunday Postcard</div><span class="tiny">You approve it first</span></div></div>
+   <div class="paper" style="transform:rotate(-1.2deg)"><div class="row" style="align-items:flex-start"><svg viewBox="40 40 250 250" width="92" height="92" style="border-radius:12px;flex:none">${familyPhoto(S.photoV)}</svg><div class="grow"><div class="tiny">To: Divya, Lakshmi, Aadhi</div><div class="hand" style="font-size:20px;line-height:1.25;margin-top:4px">Appa walked after dinner 5 days this week.</div></div></div>
+    <div class="hand" style="margin-top:10px;font-size:17px">• Never missed a morning tablet<br>• Found a new green dish: sundal<br>• Banyan grew to ${LEVELS[levelOf(S.hearts)].n}</div></div>
+   <div class="row between card tint" style="padding:12px 16px"><div><b>${S.postcardOK?'Approved. Goes out Sunday.':'Send this postcard on Sunday?'}</b><div class="tiny">Mood and sleep are never included</div></div><button class="btn sm ${S.postcardOK?'soft':''}" ${A('postcard')}>${S.postcardOK?'Approved':'Approve'}</button></div>
+   <div><div class="sec"><div class="h2">Family voices</div><button class="link" ${A('toast','Ask Divya to record a new clip (demo)')}>Add</button></div>
+    <div class="card" style="margin-top:12px;padding:6px 16px">${VOICES.map((v,i)=>`<div class="item">${avatar(v.who,40)}<div class="grow"><b>“${v.text}”</b><div class="tiny">${PEOPLE[v.who].name}</div></div><button class="iconbtn" ${A('playvoice',i)} aria-label="Play">${ico('play')}</button></div>`).join('')}</div></div>
+   <div class="card"><div class="row between"><b>Milestone Moments</b><span class="pill gold">${ico('gift',14)} Coming</span></div>
+    <div class="row" style="margin-top:10px">${avatar('aadhi',44)}<div class="grow"><b>100 days of tablets</b><div class="tiny">Aadhi is recording something special</div>${bar(S.tabletDays,'gold')}</div></div></div>
+   <div class="card tint"><div class="row">${ico('qr',34)}<div class="grow"><b>Family Check</b><div class="muted">A free sugar and BP check for Divya at Sri Murugan Medicals. Sugar runs in families.</div></div></div><button class="btn block soft" style="margin-top:12px" ${A('toast','Invite sent on WhatsApp (demo)')}>${ico('share')} Invite a relative</button></div>
+   <button class="item" ${A('open','consent')} style="width:100%;text-align:left">${ico('lock',22)}<div class="grow"><b>Who sees what</b><div class="tiny">Family Circle and privacy</div></div>${ico('chevR')}</button>
+  </div></div>`;
+};
+ACT.postcard=()=>{S.postcardOK=!S.postcardOK;render();if(S.postcardOK){hearts(4);toast('Divya will love this','heart')}};
+ACT.playvoice=(i)=>playVoice(i===undefined?undefined:+i);
+document.head.insertAdjacentHTML('beforeend','<style>.av-stack{display:flex}.av-stack .av{margin-left:-10px;border:3px solid #FFF3D1}.av-stack .av:first-child{margin-left:0}</style>');
+
+/* ---------- Nudges ---------- */
+const NUDGES=[
+{id:'am',time:'7:20 am',tag:'Routine anchor',why:'Arrives after coffee, not at 7:00:00.',ic:'pill',p:{t:'Coffee: done. Tablet: waiting.',b:'Your morning tablet is sitting next to your cup, being very patient. ☕'},g:{t:'Good morning, Appa',b:'Coffee done? Your morning tablet is right beside it.'},act:'meds',btn:'Taken'},
+{id:'curio',time:'9:40 am',tag:'Curiosity gap',why:'A small question you want answered.',ic:'scan',p:{t:'Guess what upma does to your sugar.',b:'You against the upma. Make a guess, then find out. 🔍'},g:{t:'A small mission for today',b:'Guess how upma affects your sugar, then check.'},act:'openDetective',btn:'Play'},
+{id:'social',time:'11:05 am',tag:'Social reward',why:'Warmth from family, never pressure.',ic:'heart',p:{t:'Divya sent you a 💚',b:'Send one back? One tap.'},g:{t:'Divya sent you a heart',b:'You can send one back whenever you like.'},act:'familyHeart',btn:'Send back'},
+{id:'lunch',time:'1:10 pm',tag:'Meal-time relevance',why:'Uses a dish you already love, at lunch time.',ic:'plate',p:{t:"Lakshmi amma's kootu is a star.",b:'Eat it first today. Your Dish Dex is quietly proud of it. 🥘'},g:{t:'Lunch time',b:'Kootu first, then 1 cup of rice.'},act:'log',btn:'Log lunch'},
+{id:'win',time:'Yesterday',tag:'Celebrate with your numbers',why:'Praise is your own data, not a badge.',ic:'sparkle',p:{t:'+38 instead of +90.',b:'Your walk after dinner did that. Your feet deserve a standing ovation. 👏'},g:{t:'A win',b:'Your sugar rose only 38 after dinner. Last week it was 90. Well done.'},act:'tabj',btn:'See it'},
+{id:'gift',time:'Yesterday',tag:'Variable reward',why:'A surprise, not a sale. Nothing expires.',ic:'gift',p:{t:'A scratch card is waiting.',b:'No catch, no countdown. Just a surprise from your family. 🎁'},g:{t:'A gift is waiting',b:'Open it whenever you like.'},act:'gifts',btn:'Open'},
+{id:'rain',time:'Mon',tag:'Weather aware',why:'Changes the ask to fit the day.',ic:'rain',p:{t:'Raining. Walk inside.',b:'Ten minutes up and down the hall counts. Lakshmi amma can referee. ☔'},g:{t:'Rainy evening',b:'Ten minutes walking inside the house counts too.'},act:'walk',btn:'Start'},
+{id:'sleep',time:'Sun',tag:"Ask, don't instruct",why:'When something looks off, Pulse asks how you are.',ic:'moon',p:{t:'You slept less this week.',b:"All okay? We're here if you want to talk."},g:{t:'You slept less this week',b:"All okay? We're here if you want to talk."},act:'chat',btn:'Talk'},
+];
+const nstyle=n=>S.nudgeStyle==='gentle'||S.nudgeStyle==='quiet'?n.g:n.p;
+function pushNudge(id){
+  if(S.role!=='patient'||S.nudgeStyle==='quiet'&&id!=='am')return;const n=NUDGES.find(x=>x.id===id),c=nstyle(n);
+  const h=$('#push');h.innerHTML=`<div class="push" ${A('pushOpen',id)}><div class="pt"><i>${ico('pulse'in ICONS?'pulse':'heart',13,'fill')}</i>PULSE · now</div><b>${c.t}</b><p>${c.b}</p><div class="pa"><button ${A('pushDo',id)}>${n.btn}</button><button ${A('pushLater')}>Later</button></div></div>`;
+  clearTimeout(S._pt);S._pt=setTimeout(()=>{h.innerHTML=''},12000);chime('soft');
+}
+function nudgeAct(n){
+  const a=n.act;
+  if(a==='meds'){S.stack=[{name:'meds'}]}
+  else if(a==='log'){S.slot='ln';S.stack=[{name:'log',p:'ln'}]}
+  else if(a==='openDetective'){ACT.openDetective()}
+  else if(a==='familyHeart'){ACT.familyHeart()}
+  else if(a==='tabj'){S.tab='journey';S.stack=[]}
+  else if(a==='gifts'){S.stack=[{name:'gifts'}]}
+  else if(a==='walk'){S.stack=[{name:'walk'}]}
+  else if(a==='chat'){S.stack=[{name:'chat'}]}
+}
+ACT.pushOpen=(id)=>{$('#push').innerHTML='';nudgeAct(NUDGES.find(n=>n.id===id));render()};
+ACT.pushDo=(id)=>{$('#push').innerHTML='';const n=NUDGES.find(x=>x.id===id);if(id==='am'){ACT.take('am');}else nudgeAct(n);render()};
+ACT.pushLater=()=>{$('#push').innerHTML='';toast('Okay, later is always fine','clock')};
+ACT.nudgeGo=(id)=>{nudgeAct(NUDGES.find(n=>n.id===id));render()};
+SCREENS.inbox=()=>`${head('Nudges',{right:'<span class="pill">2 of 3 today</span>'})}<div class="scroll"><div class="stack">
+ <div class="seg">${[['playful','Playful'],['gentle','Gentle'],['quiet','Quiet']].map(([k,l])=>`<button class="${S.nudgeStyle===k?'on':''}" ${A('nstyle',k)}>${l}</button>`).join('')}</div>
+ <div class="tip">${ico('info',18)}<span>Same message, your style. Tap <b>Show me</b> to feel how a nudge arrives.</span></div>
+ <button class="btn block soft" ${A('demoPush')}>${ico('bell')} Show me a nudge</button>
+ <div class="stack s8">${NUDGES.map(n=>{const c=nstyle(n);return `<div class="card"><div class="row top"><span class="qi" style="width:40px;height:40px;border-radius:12px;background:var(--g100);color:var(--g700);display:grid;place-items:center;flex:none">${ico(n.ic,20)}</span><div class="grow"><div class="row between"><b>${c.t}</b><span class="tiny">${n.time}</span></div><div class="muted">${c.b}</div><div class="row wrap" style="margin-top:8px;gap:8px"><span class="pill">${n.tag}</span><button class="link" ${A('nudgeGo',n.id)}>${n.btn}</button></div><div class="tiny" style="margin-top:4px">${n.why}</div></div></div></div>`}).join('')}</div>
+ <div class="card tint stack s8"><div class="h3">Our promise</div>${['One ask per message.','No guilt and no broken streaks. A missed day is a rest day.','Later is always an option.','At most three a day. Quiet at night.','When something looks off, we ask how you are.','Never a banner ad or a countdown.'].map(t=>`<div class="row top">${ico('check',18)}<span>${t}</span></div>`).join('')}</div></div></div>`;
+ACT.demoPush=()=>{S.stack=[];render();setTimeout(()=>pushNudge('am'),300)};
+
+const CLIP_PROMPTS=[['divya','Proud of you, Appa'],['aadhi','Thatha, super!'],['lakshmi','Take care. I am here.'],['divya','Take care, I love you'],['aadhi','Your own words']];
+const WINDOWS=[[58,60],[104,60],[150,60],[58,104],[104,104],[150,104],[58,148],[150,148]];
+function houseSVG(step){
+  return `<svg viewBox="0 0 220 190" class="house" aria-hidden="true"><path d="M20 90L110 20l90 70" fill="#E3EFDD" stroke="#5B964A" stroke-width="5" stroke-linejoin="round"/><rect x="36" y="88" width="148" height="86" rx="6" fill="#F3F8F0" stroke="#C9E0BF" stroke-width="4"/>
+  ${WINDOWS.map(([x,y],i)=>`<rect x="${x-10}" y="${y+22}" width="24" height="26" rx="5" fill="${i<=step?'#FFE08A':'#fff'}" stroke="${i<=step?'#F0AE1B':'#C9E0BF'}" stroke-width="3" ${i===step?'class="bloom"':''}/>`).slice(0,0).join('')}
+  ${[[56,102],[96,102],[136,102],[56,142],[136,142]].map(([x,y],i)=>`<rect x="${x}" y="${y}" width="28" height="26" rx="6" fill="${i<Math.ceil(step*5/8)?'#FFE08A':'#fff'}" stroke="${i<Math.ceil(step*5/8)?'#F0AE1B':'#C9E0BF'}" stroke-width="3"/>`).join('')}
+  <path d="M96 174v-22a14 14 0 0 1 28 0v22z" fill="${step>=7?'#5B964A':'#C9E0BF'}"/>
+  <circle cx="110" cy="66" r="10" fill="${step>=2?'#F0AE1B':'#fff'}" stroke="#F0AE1B" stroke-width="3"/>
+  </svg>`;
+}
+const STEP_T=['Who is this for?','Pick the home screen photo','Record Family Voices','Choose the family menu','Add the medicines','Set the daily anchors','Choose the Family Circle','Consent and start'];
+SCREENS.setup=()=>{
+  const st=S.setup,i=st.step;let b='';
+  if(S.setupDone)return setupDone();
+  if(i===0)b=`<div><span class="lbl">His name</span><input class="field" id="nm" data-bind="name" value="${S.name}" autocomplete="off"></div>
+   <div><span class="lbl">What does the family call him?</span><div class="chips">${['Appa','Thatha','Murugan sir','Annan'].map(n=>`<button class="chip ${S.nick===n?'on':''}" ${A('nick',n)}>${n}</button>`).join('')}</div></div>
+   <div><span class="lbl">His age</span><div class="chips">${[['<45','Under 45','busy'],['45-60','45 to 60','standard'],['60+','Over 60','easy']].map(([k,l])=>`<button class="chip ${st.age===k?'on':''}" ${A('age',k)}>${l}</button>`).join('')}</div></div>
+   <div class="card tint row">${ico('sparkle',22)}<span class="grow"><b>${{busy:'Busy Mode',standard:'Standard Mode',easy:'Easy Mode'}[S.mode]}</b><br><span class="muted">${{busy:'Quick, quiet, family features off.',standard:'Family home screen and daily kolam.',easy:'Three big buttons, voice first, large text.'}[S.mode]}</span></span></div>
+   <div class="row"><span class="pill line">${ico('lock',14)} English</span><span class="tiny">More languages are on the way.</span></div>`;
+  if(i===1)b=`<div class="kolam" style="width:200px">${kolamSVG({am:1,bf:1,ln:0,wk:0,pm:0})}</div><div class="grid3">${[0,1,2].map(v=>`<button class="card" ${A('photoV',v)} style="padding:5px;border-width:2px;border-color:${S.photoV===v&&!S.userPhoto?'var(--g500)':'var(--line)'}"><svg viewBox="40 40 250 250" width="100%">${familyPhoto(v)}</svg></button>`).join('')}</div><label class="btn soft block" for="photofile" style="cursor:pointer">${ico('camera')} Upload a real family photo</label><input id="photofile" type="file" accept="image/*" style="position:absolute;opacity:0;width:1px;height:1px">`;
+  if(i===2){const n=st.clips.filter(Boolean).length;b=`<p class="muted">Hold the button and speak for up to 10 seconds. Appa hears one at random after each tablet.</p>
+   <div class="card tint row"><div style="font-size:26px;letter-spacing:2px">${n?'❤️'.repeat(n):'🤍'}</div><div class="grow"><b>${n} of 5 recorded</b><div class="tiny">${n>=2?'Two are enough to start. More is lovelier.':'Record at least two'}</div></div></div>
+   ${CLIP_PROMPTS.map(([w,t],k)=>`<div class="card row" style="padding:10px 12px">${avatar(w,44)}<div class="grow"><b>“${t}”</b><div class="tiny">${st.clips[k]?'Recorded · 0:0'+st.clips[k]:'Hold the mic to record'}</div></div>${st.clips[k]?`<button class="iconbtn" ${A('playvoice',k)} aria-label="Play">${ico('play')}</button>`:''}<div class="micwrap" data-hold="rec" data-i="${k}" style="width:56px;height:56px"><button class="mic" style="width:50px;height:50px;box-shadow:0 3px 0 #2b4621;${st.clips[k]?'background:var(--g100);color:var(--g700)':''}" aria-label="Hold to record">${ico(st.clips[k]?'rotate':'mic',22)}</button></div></div>`).join('')}`}
+  if(i===3)b=`<p class="muted">Tap the dishes your home cooks. Appa never has to ask for a separate menu.</p><div class="pill gold">${st.dishes.length} dishes picked</div><div class="grid3">${DISHES.map(d=>`<button class="dish ${st.dishes.includes(d.id)?'sel':''}" ${A('dpick',d.id)} style="padding:10px 4px"><div class="em" style="font-size:28px">${d.e}</div><b style="font-size:13px">${d.n}</b></button>`).join('')}</div>`;
+  if(i===4)b=`<p class="muted">Photograph the prescription. Pulse reads it and builds the schedule.</p>
+   ${st.scanned===true?`<div class="stack s10"><div class="pill" style="align-self:flex-start">${ico('check',14)} Read 4 medicines</div>${DOSES.map(d=>`<div class="card row">${ico(d.id==='am'?'sun':'moon',26)}<div class="grow"><b>${d.t}</b><div class="tiny">${d.when}</div><div class="muted">${d.pills.join(' + ')}</div></div></div>`).join('')}<div class="tip">${ico('info',18)}<span>Check the names against the strip. Pulse never changes a dose.</span></div></div>`
+   :`<div class="paper" style="position:relative;overflow:hidden;min-height:190px"><div class="tiny">Dr. Karthik · Rx</div><div class="hand" style="font-size:20px;line-height:1.7">1. Metformin 500 mg ........ 1-0-1<br>2. Glimepiride 1 mg ........ 1-0-0<br>3. Atorvastatin 10 mg ...... 0-0-1</div>${st.scanned==='busy'?'<div style="position:absolute;left:0;right:0;height:40px;background:linear-gradient(transparent,rgba(125,176,108,.6),transparent);animation:sweep 1.2s infinite alternate"></div><style>@keyframes sweep{from{top:0}to{top:150px}}</style>':''}</div><button class="btn block" ${A('scanRx')}>${ico('camera')} ${st.scanned==='busy'?'Reading...':'Photograph prescription'}</button>`}`;
+  if(i===5){const ch=(k,opts)=>`<div><span class="lbl">${k[1]}</span><div class="chips">${opts.map(o=>`<button class="chip ${st.anchors[k[0]]===o?'on':''}" ${A('anchor',k[0]+'|'+o)}>${o}</button>`).join('')}</div></div>`;
+   b=`<p class="muted">Nudges arrive after his routine, not at a fixed minute.</p>${ch(['wake','Wakes up'],['5:30','6:00','6:30'])}${ch(['coffee','Morning coffee'],['7:00','7:15','7:30'])}${ch(['lunch','Lunch'],['12:30','1:00','1:30'])}${ch(['dinner','Dinner'],['7:30','8:00','8:30'])}
+   <div class="card tint">${ico('bell',20)} <b>Morning tablet nudge</b> will arrive just after coffee, around ${st.anchors.coffee}. The evening news and temple time can be added later.</div>`}
+  if(i===6)b=`<p class="muted">Who gets the Sunday postcard and safety alerts. Appa approves every postcard.</p><div class="card">${[['divya','Divya','You · postcard and alerts','divya'],['lakshmi','Lakshmi','Wife · postcard','lakshmi'],['aadhi','Aadhi','Grandson · voices only','aadhi']].map(([k,n,d,c])=>`<div class="item">${avatar(k,46)}<div class="grow"><b>${n}</b><div class="tiny">${d}</div></div>${toggle(st.circle[c],'circ',c)}</div>`).join('')}<div class="item">${ico('lock',30)}<div class="grow"><b>Mood and sleep</b><div class="tiny">Never shared. Automatically excluded.</div></div><span class="pill">Private</span></div></div>`;
+  if(i===7)b=`<div class="card tint row">${ico('rupee',30)}<div class="grow"><b>Start free. Pay nothing today.</b><div class="muted">Two free weeks bring the first insight. The plan is chosen on Day 15, with the savings in hand.</div></div></div>
+   <div class="card">${[['readings','Readings and meals'],['meds','Medicine list for refills'],['postcard','Weekly postcard to family'],['doctor','Doctor Page for visits']].map(([k,t])=>`<div class="item"><b class="grow">${t}</b>${toggle(st.consent[k],'consentTog',k)}</div>`).join('')}</div>
+   <div class="calm">${S.nick} will confirm each of these himself, in his own language, when he first opens the app.</div>`;
+  const dis=(i===2&&st.clips.filter(Boolean).length<2)||(i===3&&st.dishes.length<6)||(i===4&&st.scanned!==true);
+  return `<div style="display:flex;flex-direction:column;height:100%">${head(`Build ${S.nick}'s home`,{right:`<span class="pill">${i+1} of 8</span>`})}
+  <div class="scroll" data-k="setup"><div class="stack s20"><div class="ticks">${STEP_T.map((_,k)=>`<i class="${k<=i?'on':''}"></i>`).join('')}</div>${houseSVG(i)}<div class="h2">${STEP_T[i]}</div>${b}</div></div>
+  <div class="ovfoot row"><button class="btn ghost" ${A('setupPrev')} ${i===0?'disabled':''}>Back</button><button class="btn grow" ${A('setupNext')} ${dis?'disabled':''}>${i===7?'Build the home':'Next'}</button></div></div>`;
+};
+ACT.nick=(n)=>{S.nick=n;render()};
+ACT.age=(k)=>{S.setup.age=k;S.mode={'<45':'busy','45-60':'standard','60+':'easy'}[k];render()};
+ACT.dpick=(id)=>{const d=S.setup.dishes,i=d.indexOf(id);i>=0?d.splice(i,1):d.push(id);chime('pop');render()};
+ACT.scanRx=()=>{if(S.setup.scanned)return;S.setup.scanned='busy';render();setTimeout(()=>{S.setup.scanned=true;chime('ok');render()},1400)};
+ACT.anchor=(a)=>{const [k,v]=a.split('|');S.setup.anchors[k]=v;render()};
+ACT.circ=(c)=>{S.setup.circle[c]=!S.setup.circle[c];render()};
+ACT.setupPrev=()=>{S.setup.step=Math.max(0,S.setup.step-1);render()};
+ACT.setupNext=()=>{const s=S.setup;if(s.step<7){s.step++;chime('pop');render();const sc=$('#ov-setup .scroll');if(sc)sc.scrollTop=0}else{S.setupDone=true;confetti(70);chime('win');render()}};
+HOLD.rec={t0:0,i:0,down(el){this.t0=Date.now();this.i=+el.dataset.i;el.classList.add('live')},up(){const el=document.querySelector('.micwrap.live');if(el)el.classList.remove('live');
+ const d=Date.now()-this.t0;if(d<600){toast('Hold a little longer and speak','mic');return}S.setup.clips[this.i]=Math.min(9,Math.max(2,Math.round(d/1000)+2));chime('ok');hearts(3);render()}};
+function setupDone(){
+  const n=S.setup.clips.filter(Boolean).length;
+  return `<div style="display:flex;flex-direction:column;height:100%"><div class="scroll"><div class="stack s20 center" style="padding-top:26px"><div class="tiny">Home Builder unlocked</div><div class="kolam" style="width:min(80%,250px)">${kolamSVG({am:1,bf:1,ln:1,wk:1,pm:1})}</div>
+  <div class="h1">${S.nick}'s home is ready</div><p class="muted">A photo, ${n} family voice${n===1?'':'s'}, ${S.setup.dishes.length} home dishes and every medicine. Built in about 15 minutes.</p>
+  <div class="grid3"><div class="stat"><b>${n}</b><small>Voices</small></div><div class="stat"><b>${S.setup.dishes.length}</b><small>Dishes</small></div><div class="stat"><b>+120</b><small>Hearts gifted</small></div></div>
+  <div class="card gold row" style="text-align:left">${ico('gift',32)}<div class="grow"><b>Your gift to ${S.nick}</b><div class="muted">120 starter hearts and his first scratch card</div></div></div>
+  <div class="card tint" style="text-align:left"><div class="tiny">Link for ${S.nick}</div><b>pulse.health/h/${S.name.toLowerCase().replace(/\s+/g,'')}</b></div></div></div>
+  <div class="ovfoot stack s10"><button class="btn block gold" ${A('sendLink')}>${ico('share')} Send the link to ${S.nick}</button><button class="btn block" ${A('openAsAppa')}>Open as ${S.nick}</button></div></div>`;
+}
+ACT.sendLink=()=>toast('Link sent on WhatsApp (demo)','share');
+ACT.openAsAppa=()=>{S.setupDone=false;S.role='patient';S.stack=[];S.tab='home';S.hearts=Math.max(S.hearts,120);S.gifts=Math.max(S.gifts,1);render();setTimeout(()=>{playVoice(0);confetti(30)},700)};
+
+/* ---------- Helper (Divya) view ---------- */
+VIEWS.helper=()=>{
+  const t=S.htab;
+  const body=t==='today'?helperToday():t==='voices'?helperVoices():helperPlan();
+  return `<div class="view"><div class="topbar">${avatar('divya',46)}<div class="grow"><div class="hello">Hi, Divya</div><div class="sub">Bengaluru · looking after ${S.nick} from afar</div></div><button class="iconbtn" ${A('switchRole')} aria-label="Switch person">${ico('user')}</button></div>
+  <div class="scroll has-tab" data-k="h-${t}"><div class="stack s20">${body}</div></div></div>`+tabbar([{id:'today',i:'home',l:`${S.nick}'s day`},{id:'voices',i:'mic',l:'Voices'},{id:'plan',i:'rupee',l:'Plan'}],t,'htab');
+};
+ACT.htab=(t)=>{S.htab=t;render()};
+function helperToday(){
+  const feed=[['8:10 am','Morning tablets taken','pill'],['8:40 am','Breakfast: 3 idli, sambar, coffee. Green.','plate'],['11:02 am','You sent a heart','heart'],['12:30 pm','Refill packed at Sri Murugan Medicals','store']];
+  return `<div class="card center"><div class="kolam" style="width:min(86%,250px)">${kolamSVG(S.quests,{ro:1})}</div><b>${petals()} of 5 petals bloomed</b><div class="tiny">${S.nick}'s day · you see what he allows</div></div>
+  <div class="grid2"><button class="btn soft" ${A('familyHeart')}>${ico('heart',20,'fill')} Send a heart</button><button class="btn soft" ${A('toast','Gentle ping sent: "Divya says hi" (demo)')}>${ico('bell')} Say hi</button></div>
+  <div class="card"><div class="h3" style="margin-bottom:6px">Today</div>${feed.map(f=>`<div class="item"><span class="qi" style="width:38px;height:38px;border-radius:12px;background:var(--g100);color:var(--g700);display:grid;place-items:center;flex:none">${ico(f[2],19)}</span><div class="grow"><b>${f[1]}</b></div><span class="tiny">${f[0]}</span></div>`).join('')}</div>
+  <div class="card gold row">${ico('trophy',30)}<div class="grow"><b>Family quest: ${S.challenge} of 5 walks</b><div class="muted">Take a 10-minute walk where you are and it counts for him.</div></div></div>
+  <div class="card tint row">${ico('lock',24)}<span class="grow muted">Mood and sleep are private to ${S.nick}. You will never see them, however you set things up.</span></div>
+  <div class="card row">${ico('qr',30)}<div class="grow"><b>Your own free check</b><div class="muted">Family Check at Sri Murugan Medicals next time you visit.</div></div></div>`;
+}
+function helperVoices(){
+  return `<div class="h2">Voices for ${S.nick}</div><p class="muted">One of these plays after every tablet. Add a new one any time. Surprise him on a Sunday.</p>
+  ${CLIP_PROMPTS.map(([w,t],k)=>`<div class="card row">${avatar(w,44)}<div class="grow"><b>“${t}”</b><div class="tiny">${S.setup.clips[k]||k<3?'Recorded':'Not yet recorded'}</div></div><button class="iconbtn" ${A('playvoice',k)} aria-label="Play">${ico('play')}</button></div>`).join('')}
+  <div class="card gold center stack s10"><b>Record a surprise for tonight</b><div class="micwrap" data-hold="chat" style="width:110px;height:110px"><button class="mic" style="width:84px;height:84px;box-shadow:0 5px 0 #2b4621" aria-label="Hold to record">${ico('mic')}</button></div><div class="tiny">Hold to record. Appa hears it after his night tablet.</div></div>`;
+}
+function helperPlan(){
+  return `<div class="card dark"><div class="tiny" style="color:#C9E0BF">Household plan</div><div class="h2" style="color:#fff;font-size:26px">${S.plan==='free'?'Pulse Free':'Saathi Annual'}</div><div style="opacity:.9">Up to two people with diabetes at home · you pay by UPI</div></div>
+  <div class="card"><div class="row between"><b>Savings Meter</b><b style="color:var(--g700)">₹${S.saved.toLocaleString('en-IN')} of ₹1,999</b></div>${bar(S.saved/1999*100,'gold')}</div>
+  <button class="btn block" ${A('sheet','plan')}>Compare plans</button>
+  <div class="card row">${ico('store',28)}<div class="grow"><b>Refill Ready</b><div class="muted">Metformin runs out in 5 days. Sri Murugan Medicals will pack it.</div></div></div>
+  <button class="btn block gold" ${A('toast','Paid ₹680 by UPI (demo)')}>${ico('rupee')} Pay ₹680 for the refill</button>
+  <div class="tip">${ico('info',18)}<span>The chemist sees refills only. Not readings, mood or voices.</span></div>`;
+}
+
+/* ---------- Counter Mode (chemist) ---------- */
+const keep=mp=>Math.round(mp*.137);
+VIEWS.chemist=()=>{
+  const t=S.ctab,c=S.counter;
+  const body=t==='queue'?counterQueue():t==='check'?counterCheck():counterEarn();
+  return `<div class="view"><div class="topbar">${avatar('raj',46)}<div class="grow"><div class="hello" style="font-size:19px">Sri Murugan Medicals</div><div class="sub">Counter Mode · Pulse point Silver</div></div><button class="iconbtn" ${A('switchRole')} aria-label="Switch person">${ico('user')}</button></div>
+  <div class="scroll has-tab" data-k="c-${t}"><div class="stack s20">${body}</div></div></div>`+tabbar([{id:'queue',i:'pill',l:'Refills'},{id:'check',i:'activity',l:'Counter Check'},{id:'earn',i:'rupee',l:'Earnings'}],t,'ctab');
+};
+ACT.ctab=(t)=>{S.ctab=t;render()};
+const ST=['New','Packed','Collected'];
+function counterQueue(){
+  const q=S.counter.queue;
+  return `<div class="grid2"><div class="stat"><b>${q.filter(x=>x.st<2).length}</b><small>Refills today</small></div><div class="stat"><b>${S.counter.members}</b><small>Pulse members</small></div></div>
+  <button class="btn block gold" ${A('sheet','enrol')}>${ico('qr')} Enrol a new family</button>
+  <div class="sec"><div class="h2">Refill Ready</div><span class="tiny">Pack 5 days before they run out</span></div>
+  ${q.map(r=>`<div class="card ${r.st===2?'tint':''}"><div class="row between"><b>${r.n}</b><span class="pill ${r.st===2?'':r.st===1?'sky':'gold'}">${ST[r.st]}</span></div>
+   <div class="muted" style="margin:4px 0 8px">${r.m.join(' · ')}</div><div class="ticks" style="margin-bottom:10px">${[0,1,2].map(i=>`<i class="${i<=r.st?'on':''}"></i>`).join('')}</div>
+   <div class="row between"><div><div class="tiny">Runs out in ${r.d} days · UPI paid</div><b>₹${r.mp}</b> <span class="tiny" style="text-decoration:line-through">₹${r.mrp}</span></div><div style="text-align:right"><div class="tiny">You keep</div><b style="color:var(--g700)">₹${keep(r.mp)}</b></div></div>
+   ${r.st<2?`<button class="btn block" style="margin-top:12px" ${A('advance',r.id)}>${r.st===0?'Mark packed':'Handed over or delivered'}</button>`:''}</div>`).join('')}
+  <div class="tip">${ico('info',18)}<span>You dispense what the doctor prescribed. No brand switches, no dose advice. Pulse doesn't stock or sell medicines.</span></div>`;
+}
+ACT.advance=(id)=>{const r=S.counter.queue.find(x=>x.id==+id);r.st++;chime(r.st===2?'win':'pop');if(r.st===2){S.counter.earn+=keep(r.mp);confetti(24);toast(`Collected. You keep ₹${keep(r.mp)}. The family's adherence signal is logged.`,'check')}else toast('Packed. The family is told.','check');render()};
+SHEETS.enrol=()=>`<div class="stack"><div class="h2">Enrol a family</div><p class="muted">Start the 15-minute setup together, or send the setup link to a daughter or son in another city.</p>
+ <div><span class="lbl">Patient's phone number</span><input class="field" id="ph" inputmode="tel" placeholder="98765 43210"></div>
+ <div class="card tint row">${ico('qr',40)}<div class="grow"><b>Or show your standee QR</b><div class="tiny">The family scans it with their phone</div></div></div>
+ <div class="card row">${ico('phone',26)}<div class="grow"><b>No smartphone?</b><div class="tiny">Enrol by phone number. Pulse calls with voice reminders and you serve the refills.</div></div></div>
+ <button class="btn block" ${A('enrolGo')}>Send setup link</button><div class="tiny center">₹150 bonus when the household starts a paid plan.</div></div>`;
+ACT.enrolGo=()=>{S.sheet=null;S.counter.members++;render();toast('Setup link sent. +1 member.','check');confetti(20)};
+function counterCheck(){
+  const c=S.counter,hi=c.bpS>=140||c.bpD>=90,sent=c.sent;
+  const stp=(k,l,u,st)=>`<div class="card row between"><div><div class="tiny">${l}</div><div class="big-num" style="font-size:40px">${c[k]}</div><div class="tiny">${u}</div></div><div class="stepper"><button ${A('cc',k+'|-'+st)} aria-label="Lower ${l}">−</button><button ${A('cc',k+'|'+st)} aria-label="Raise ${l}">+</button></div></div>`;
+  return `<div class="h2">Free monthly Counter Check</div><div class="card tint row">${avatar('murugan',46)}<div class="grow"><b>Murugan S.</b><div class="tiny">Stamp ${S.stamps+1} of 12 this year</div></div><span class="pill">Member</span></div>
+  ${stp('sug','Finger-prick sugar','mg/dL',2)}${stp('bpS','Blood pressure, top','mmHg',2)}${stp('bpD','Blood pressure, bottom','mmHg',2)}
+  <button class="btn soft block" ${A('ccDemo')}>Use the demo reading 156/96</button>
+  ${sent?`<div class="${hi?'warn':'calm'}"><b>${hi?'Out of range. Sent to the care team.':'Logged. In range.'}</b><br>${hi?'Please just say: "Your doctor will call you." Do not advise.':'You earned ₹10 for this check.'}</div>`:''}
+  <button class="btn block" ${A('ccSend')}>${ico('check')} Log this check</button><div class="tip">${ico('info',18)}<span>There are no advice fields on purpose. Out-of-range values go to the care team, not to you to interpret.</span></div>`;
+}
+ACT.cc=(a)=>{const [k,d]=a.split('|');S.counter[k]=Math.max(40,S.counter[k]+ +d);S.counter.sent=false;render()};
+ACT.ccDemo=()=>{S.counter.bpS=156;S.counter.bpD=96;S.counter.sug=124;S.counter.sent=false;render()};
+ACT.ccSend=()=>{S.counter.sent=true;S.counter.earn+=10;S.stamps=Math.min(12,S.stamps+1);chime('ok');render();toast('Logged. +₹10','check')};
+function counterEarn(){
+  const m=S.counter.members;
+  return `<div class="card dark center"><div class="tiny" style="color:#C9E0BF">This month, your Pulse point earned</div><div class="big-num" style="color:#fff">₹${S.counter.earn.toLocaleString('en-IN')}</div><div style="opacity:.9;font-size:14px">New money from members, not discounts</div></div>
+  <div class="card stack s8">${[['Refills kept at member price',`${m} members × ₹93`,m*93],['Counter Checks',`${m} × ₹10`,m*10],['Enrolment bonuses','16 households × ₹150',2400]].map(([t,s,v])=>`<div class="row"><div class="grow"><b>${t}</b><div class="tiny">${s}</div></div><b>₹${v.toLocaleString('en-IN')}</b></div>`).join('')}</div>
+  <div class="card gold"><div class="row between"><b>Pulse point level</b><span class="pill gold">${ico('trophy',14)} Silver</span></div>${bar(m/120*100,'gold')}<div class="tiny" style="margin-top:6px">${120-m} more members to Gold. Gold earns a bigger standee and a Sugar Sunday corner.</div>
+   <div class="row" style="margin-top:12px;justify-content:space-around;text-align:center">${[['Bronze',25],['Silver',60],['Gold',120]].map(([n,v])=>`<div style="opacity:${m>=v?1:.4}"><div style="font-size:30px">${['🥉','🥈','🥇'][['Bronze','Silver','Gold'].indexOf(n)]}</div><div class="tiny">${n} · ${v}</div></div>`).join('')}</div></div>
+  <div class="grid2"><div class="stat"><b>12</b><small>Elders served without the app</small></div><div class="stat"><b>96%</b><small>Refills collected on time</small></div></div>`;
+}
+
+/* ---------- Demo director ---------- */
+const S0=JSON.stringify(S),D0=JSON.stringify(DISHES);
+function resetState(){const f=JSON.parse(S0);Object.keys(S).forEach(k=>delete S[k]);Object.assign(S,f);JSON.parse(D0).forEach((o,i)=>{const d=DISHES[i];Object.keys(d).forEach(k=>delete d[k]);Object.assign(d,o)});}
+const DEMO=[
+ ['Divya sets up Appa\'s home',()=>{S.role='helper';S.htab='today';S.setup.step=0;S.setupDone=false;S.stack=[{name:'setup'}]}],
+ ['Appa takes a tablet, hears Divya',()=>{S.role='patient';S.mode='standard';S.tab='home';S.quests.am=false;S.doses.am=null;S.stack=[{name:'meds'}]}],
+ ['He logs lunch by voice',()=>{S.role='patient';S.mode='standard';S.tab='plate';S.plateTab='log';S.slot='ln';S.stack=[]}],
+ ['Dish colours, My Plate, Kitchen Card',()=>{S.role='patient';S.tab='plate';S.plateTab='plan';S.stack=[]}],
+ ['A 62 mg/dL reading fires the Safety Net',()=>{S.role='patient';S.stack=[{name:'safety'}];S.safe={}}],
+ ['Chemist logs a BP of 156/96',()=>{S.role='chemist';S.ctab='check';S.counter.bpS=156;S.counter.bpD=96;S.counter.sug=124;S.counter.sent=false}],
+ ['Care team prompt reaches Appa',()=>{S.role='patient';S.tab='care';S.carePrompt='open';S.notNow=0;S.stack=[]}],
+ ['Day 90: Report Card and Savings Meter',()=>{S.role='patient';S.day=90;S.saved=2638;S.hearts=Math.max(S.hearts,1580);S.tab='journey';S.stack=[{name:'report'}];setTimeout(()=>{confetti(60);chime('win')},500)}],
+];
+function demoContent(){
+  return `<div class="stack s8">${DEMO.map((d,i)=>`<button class="demo-step" ${A('demo',i)}><b>${i+1}</b><span>${d[0]}</span></button>`).join('')}</div>
+  <h3>Look</h3><div class="demo-row">${[['easy','Easy Mode'],['standard','Standard'],['busy','Busy Mode']].map(([k,l])=>`<button class="demo-chip ${S.mode===k&&S.role==='patient'?'on':''}" ${A('demoMode',k)}>${l}</button>`).join('')}</div>
+  <h3>Jump in the 90 days</h3><div class="demo-row">${[[1,'Day 1'],[23,'Day 23'],[60,'Day 60'],[90,'Day 90']].map(([d,l])=>`<button class="demo-chip ${S.day===d?'on':''}" ${A('demoDay',d)}>${l}</button>`).join('')}</div>
+  <h3>Other</h3><div class="demo-row"><button class="demo-chip" ${A('demoPush')}>Fire a nudge</button><button class="demo-chip" ${A('demoComplete')}>Bloom all petals</button><button class="demo-chip" ${A('demoReset')}>Reset</button></div>`;
+}
+function demoPanel(){
+  return `<h1>Pulse</h1><p class="tag">Diabetes care that feels like home. A playable front-end prototype.</p>
+  <h3>Walk the prototype journey</h3>${demoContent()}
+  <h3>How Pulse plays</h3><ul class="note"><li><b>Kolam:</b> five daily petals around the family photo. A missed day is a rest day, never a broken streak.</li><li><b>Family Banyan:</b> hearts grow it across the 90 days.</li><li><b>Variable rewards:</b> a random family voice after every tablet, scratch cards, Dish Dex reveals.</li><li><b>Co-op, not rivalry:</b> the Family Quest is won together.</li><li><b>Calm where it counts:</b> Safety Net and Mood check have no games at all.</li></ul>`;
+}
+SHEETS.demo=()=>`<div class="stack"><div class="h2">Demo director</div><p class="muted">Jump to any moment of the Phase 1 prototype journey.</p>${demoContent()}</div>`;
+Object.assign(ACT,{
+ demo(i){S.sheet=null;S.voice=null;$('#push').innerHTML='';DEMO[+i][1]();render();const sc=document.querySelector('.scroll');if(sc)sc.scrollTop=0},
+ demoMode(m){S.role='patient';S.mode=m;S.tab='home';S.stack=[];S.sheet=null;render()},
+ demoDay(d){S.day=+d;S.hearts={1:20,23:340,60:900,90:1580}[d];S.saved={1:0,23:1180,60:1900,90:2638}[d];S.tabletDays={1:1,23:64,60:92,90:100}[d];S.challenge={1:0,23:4,60:5,90:5}[d];S.sheet=null;render();toast('Jumped to Day '+d,'calendar')},
+ demoComplete(){QUESTS.forEach(q=>S.quests[q.id]=true);S.tab='home';S.stack=[];S.role='patient';render();setTimeout(()=>{confetti(60);chime('win');sheet('daydone')},300)},
+ demoReset(){resetState();$('#push').innerHTML='';render();toast('Prototype reset','rotate')},
+});
+ACT.openDemo=()=>sheet('demo');
+
+/* ---------- Boot ---------- */
+render();
+
+</script>
